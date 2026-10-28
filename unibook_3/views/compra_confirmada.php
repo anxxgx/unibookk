@@ -24,6 +24,16 @@
             'daviplata'    => 'Daviplata',
         ];
         $metodoLabel = $metodosPago[$compraConfirmada['metodo_pago']] ?? $compraConfirmada['metodo_pago'];
+        // La consulta de Compra usa nombre_vendedor/apellido_vendedor.
+        // Se conserva compatibilidad con datos de versiones anteriores.
+        $vendedorNombre = trim(
+            ($compraConfirmada['nombre_vendedor'] ?? $compraConfirmada['vendedor_nombre'] ?? '')
+            . ' '
+            . ($compraConfirmada['apellido_vendedor'] ?? $compraConfirmada['vendedor_apellido'] ?? '')
+        );
+        if ($vendedorNombre === '') {
+            $vendedorNombre = 'Vendedor no disponible';
+        }
         ?>
 
         <div class="text-center reveal">
@@ -49,7 +59,7 @@
                 <h4><?php echo $compraConfirmada['titulo']; ?></h4>
                 <p><i class="bi bi-person ub-icon" aria-hidden="true"></i> <?php echo $compraConfirmada['autor']; ?></p>
                 <p><i class="bi bi-credit-card ub-icon" aria-hidden="true"></i> Método: <b><?php echo $metodoLabel; ?></b></p>
-                <p><i class="bi bi-person-circle ub-icon" aria-hidden="true"></i> Vendedor: <b><?php echo htmlspecialchars($compraConfirmada['vendedor_nombre'] . ' ' . $compraConfirmada['vendedor_apellido']); ?></b></p>
+                <p><i class="bi bi-person-circle ub-icon" aria-hidden="true"></i> Vendedor: <b><?php echo htmlspecialchars($vendedorNombre, ENT_QUOTES, 'UTF-8'); ?></b></p>
             </div>
 
             <div class="checkout-summary__price">

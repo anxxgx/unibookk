@@ -6,6 +6,7 @@ if(session_status() === PHP_SESSION_NONE){
 
 session_destroy();
 
-header("Location: index.php?accion=login");
+// Al cerrar sesión se vuelve a la página pública principal.
+header("Location: index.php?accion=landing");
 
 exit();

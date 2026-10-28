@@ -86,7 +86,7 @@
         <?php } ?>
 
         <!-- Formulario de confirmación -->
-        <form method="POST" action="index.php">
+        <form method="POST" action="index.php?accion=checkout&amp;id=<?php echo (int)$libro['id']; ?>">
 
             <input type="hidden" name="libro_id" value="<?php echo $libro['id']; ?>">
 

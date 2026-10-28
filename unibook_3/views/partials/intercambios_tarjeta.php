@@ -169,7 +169,7 @@ $ixFechaTexto = $ixFecha($intercambio['fecha_creacion'] ?? '');
 
                 <form
                     method="POST"
-                    action="index.php"
+                    action="index.php?accion=intercambios_recibidos"
                     onsubmit="return confirm('¿Seguro que quieres aceptar este intercambio?');"
                 >
                     <input type="hidden" name="intercambio_id" value="<?= (int)$intercambio['id'] ?>">
@@ -182,7 +182,7 @@ $ixFechaTexto = $ixFecha($intercambio['fecha_creacion'] ?? '');
 
                 <form
                     method="POST"
-                    action="index.php"
+                    action="index.php?accion=intercambios_recibidos"
                     onsubmit="return confirm('¿Seguro que quieres rechazar este intercambio?');"
                 >
                     <input type="hidden" name="intercambio_id" value="<?= (int)$intercambio['id'] ?>">

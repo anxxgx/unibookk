@@ -168,7 +168,7 @@ if ($misLibros) {
             <?php if (count($librosDisponibles) > 0): ?>
 
                 <form
-                    action="index.php"
+                    action="index.php?accion=solicitar_intercambio&amp;id=<?php echo (int)$libroSolicitado['id']; ?>"
                     method="POST"
                 >
 

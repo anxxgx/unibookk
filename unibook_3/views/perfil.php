@@ -437,7 +437,7 @@ $dispoClasesPerfil = [
                                         <i class="bi bi-eye ub-icon" aria-hidden="true"></i> Ver
                                     </a>
 
-                                    <form method="POST" action="index.php" class="ubp-inline" onsubmit="return confirmarEliminacion();">
+                                    <form method="POST" action="index.php?accion=perfil" class="ubp-inline" onsubmit="return confirmarEliminacion();">
                                         <input type="hidden" name="id" value="<?php echo (int)$libro['id']; ?>">
                                         <button type="submit" name="eliminar_libro" class="btn-ub btn-ub-danger btn-ub-sm"
                                                 aria-label="Eliminar <?php echo $e($libro['titulo']); ?>">

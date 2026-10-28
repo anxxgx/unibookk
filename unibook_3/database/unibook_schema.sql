@@ -1,0 +1,239 @@
+-- UniBook: instalación inicial de la base de datos
+-- Compatible con MySQL 8+ y MariaDB 10.4+.
+-- Ejecútalo una vez en phpMyAdmin (pestaña SQL) o con el cliente mysql.
+-- Este archivo crea la estructura; no agrega usuarios ni datos de prueba.
+
+CREATE DATABASE IF NOT EXISTS unibook
+  CHARACTER SET utf8mb4
+  COLLATE utf8mb4_unicode_ci;
+
+USE unibook;
+
+CREATE TABLE IF NOT EXISTS roles (
+  id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  nombre VARCHAR(50) NOT NULL,
+  UNIQUE KEY uq_roles_nombre (nombre)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+INSERT IGNORE INTO roles (id, nombre) VALUES
+  (1, 'Administrador'),
+  (2, 'Estudiante');
+
+CREATE TABLE IF NOT EXISTS usuarios (
+  id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  nombre VARCHAR(100) NOT NULL,
+  apellido VARCHAR(100) NOT NULL,
+  correo VARCHAR(150) NOT NULL,
+  password VARCHAR(255) NOT NULL,
+  telefono VARCHAR(20) NULL,
+  foto VARCHAR(255) NULL,
+  foto_perfil VARCHAR(255) NULL,
+  biografia VARCHAR(500) NULL,
+  universidad VARCHAR(150) NULL,
+  carrera VARCHAR(150) NULL,
+  semestre VARCHAR(20) NULL,
+  fecha_registro TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  estado ENUM('activo', 'inactivo') NOT NULL DEFAULT 'activo',
+  rol_id INT UNSIGNED NOT NULL DEFAULT 2,
+  UNIQUE KEY uq_usuarios_correo (correo),
+  KEY idx_usuarios_rol (rol_id),
+  CONSTRAINT fk_usuarios_rol
+    FOREIGN KEY (rol_id) REFERENCES roles (id)
+    ON UPDATE CASCADE ON DELETE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS libros (
+  id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  titulo VARCHAR(150) NOT NULL,
+  autor VARCHAR(100) NOT NULL,
+  editorial VARCHAR(100) NULL,
+  universidad VARCHAR(100) NULL,
+  carrera VARCHAR(100) NULL,
+  semestre VARCHAR(50) NULL,
+  materia VARCHAR(100) NULL,
+  descripcion TEXT NULL,
+  precio DECIMAL(10, 2) NULL,
+  estado ENUM('Nuevo', 'Usado') NOT NULL DEFAULT 'Usado',
+  tipo_publicacion ENUM('Venta', 'Intercambio') NOT NULL DEFAULT 'Venta',
+  imagen VARCHAR(255) NULL,
+  fecha_publicacion TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  usuario_id INT UNSIGNED NOT NULL,
+  estado_disponibilidad ENUM('disponible', 'reservado', 'vendido', 'intercambiado')
+    NOT NULL DEFAULT 'disponible',
+  KEY idx_libros_usuario (usuario_id),
+  KEY idx_libros_catalogo (estado_disponibilidad, tipo_publicacion, fecha_publicacion),
+  CONSTRAINT fk_libros_usuario
+    FOREIGN KEY (usuario_id) REFERENCES usuarios (id)
+    ON UPDATE CASCADE ON DELETE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS compras (
+  id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  libro_id INT UNSIGNED NOT NULL,
+  comprador_id INT UNSIGNED NOT NULL,
+  vendedor_id INT UNSIGNED NOT NULL,
+  precio DECIMAL(10, 2) NOT NULL,
+  metodo_pago ENUM('pse', 'nequi', 'bancolombia', 'daviplata') NOT NULL,
+  estado ENUM('pendiente', 'confirmada', 'rechazada', 'cancelada')
+    NOT NULL DEFAULT 'pendiente',
+  fecha_compra DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  fecha_actualizacion DATETIME NULL,
+  KEY idx_compras_libro (libro_id),
+  KEY idx_compras_comprador (comprador_id, fecha_compra),
+  KEY idx_compras_vendedor (vendedor_id, fecha_compra),
+  CONSTRAINT fk_compras_libro
+    FOREIGN KEY (libro_id) REFERENCES libros (id)
+    ON UPDATE CASCADE ON DELETE RESTRICT,
+  CONSTRAINT fk_compras_comprador
+    FOREIGN KEY (comprador_id) REFERENCES usuarios (id)
+    ON UPDATE CASCADE ON DELETE RESTRICT,
+  CONSTRAINT fk_compras_vendedor
+    FOREIGN KEY (vendedor_id) REFERENCES usuarios (id)
+    ON UPDATE CASCADE ON DELETE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS intercambios (
+  id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  libro_solicitado_id INT UNSIGNED NOT NULL,
+  libro_ofrecido_id INT UNSIGNED NOT NULL,
+  solicitante_id INT UNSIGNED NOT NULL,
+  propietario_id INT UNSIGNED NOT NULL,
+  estado ENUM('pendiente', 'aceptado', 'rechazado') NOT NULL DEFAULT 'pendiente',
+  fecha_creacion TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  fecha_actualizacion TIMESTAMP NULL DEFAULT NULL,
+  KEY idx_intercambios_solicitado (libro_solicitado_id),
+  KEY idx_intercambios_ofrecido (libro_ofrecido_id),
+  KEY idx_intercambios_solicitante (solicitante_id, estado),
+  KEY idx_intercambios_propietario (propietario_id, estado),
+  CONSTRAINT fk_intercambios_libro_solicitado
+    FOREIGN KEY (libro_solicitado_id) REFERENCES libros (id)
+    ON UPDATE CASCADE ON DELETE RESTRICT,
+  CONSTRAINT fk_intercambios_libro_ofrecido
+    FOREIGN KEY (libro_ofrecido_id) REFERENCES libros (id)
+    ON UPDATE CASCADE ON DELETE RESTRICT,
+  CONSTRAINT fk_intercambios_solicitante
+    FOREIGN KEY (solicitante_id) REFERENCES usuarios (id)
+    ON UPDATE CASCADE ON DELETE RESTRICT,
+  CONSTRAINT fk_intercambios_propietario
+    FOREIGN KEY (propietario_id) REFERENCES usuarios (id)
+    ON UPDATE CASCADE ON DELETE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS mensajes (
+  id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  remitente_id INT UNSIGNED NOT NULL,
+  destinatario_id INT UNSIGNED NOT NULL,
+  libro_id INT UNSIGNED NOT NULL,
+  mensaje TEXT NOT NULL,
+  leido TINYINT(1) NOT NULL DEFAULT 0,
+  fecha_creacion DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  KEY idx_mensajes_conversacion (libro_id, remitente_id, destinatario_id, fecha_creacion),
+  KEY idx_mensajes_destinatario (destinatario_id, leido),
+  CONSTRAINT fk_mensajes_remitente
+    FOREIGN KEY (remitente_id) REFERENCES usuarios (id)
+    ON UPDATE CASCADE ON DELETE CASCADE,
+  CONSTRAINT fk_mensajes_destinatario
+    FOREIGN KEY (destinatario_id) REFERENCES usuarios (id)
+    ON UPDATE CASCADE ON DELETE CASCADE,
+  CONSTRAINT fk_mensajes_libro
+    FOREIGN KEY (libro_id) REFERENCES libros (id)
+    ON UPDATE CASCADE ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS notificaciones (
+  id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  usuario_id INT UNSIGNED NOT NULL,
+  tipo VARCHAR(50) NOT NULL,
+  titulo VARCHAR(150) NOT NULL,
+  mensaje TEXT NOT NULL,
+  enlace VARCHAR(255) NULL,
+  leida TINYINT(1) NOT NULL DEFAULT 0,
+  fecha_creacion DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  KEY idx_notificaciones_usuario_leida (usuario_id, leida, fecha_creacion),
+  CONSTRAINT fk_notificaciones_usuario
+    FOREIGN KEY (usuario_id) REFERENCES usuarios (id)
+    ON UPDATE CASCADE ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS comunidad_publicaciones (
+  id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  usuario_id INT UNSIGNED NOT NULL,
+  categoria ENUM('busco_libro', 'recurso_academico', 'pregunta_universitaria', 'recomendacion', 'otro')
+    NOT NULL DEFAULT 'otro',
+  titulo VARCHAR(150) NOT NULL,
+  contenido TEXT NOT NULL,
+  asignatura VARCHAR(120) NULL,
+  carrera VARCHAR(120) NULL,
+  libro_titulo VARCHAR(150) NULL,
+  libro_autor VARCHAR(100) NULL,
+  modalidad ENUM('compra', 'intercambio', 'cualquiera') NULL,
+  imagen VARCHAR(255) NULL,
+  estado ENUM('activa', 'resuelta', 'cerrada') NOT NULL DEFAULT 'activa',
+  fecha_creacion DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  fecha_edicion DATETIME NULL,
+  KEY idx_cpub_usuario (usuario_id),
+  KEY idx_cpub_filtro (categoria, estado, fecha_creacion),
+  CONSTRAINT fk_cpub_usuario
+    FOREIGN KEY (usuario_id) REFERENCES usuarios (id)
+    ON UPDATE CASCADE ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS comunidad_comentarios (
+  id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  publicacion_id INT UNSIGNED NOT NULL,
+  usuario_id INT UNSIGNED NOT NULL,
+  parent_id INT UNSIGNED NULL,
+  contenido TEXT NOT NULL,
+  eliminado TINYINT(1) NOT NULL DEFAULT 0,
+  fecha_creacion DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  fecha_edicion DATETIME NULL,
+  KEY idx_ccom_publicacion (publicacion_id, parent_id, id),
+  KEY idx_ccom_usuario (usuario_id),
+  CONSTRAINT fk_ccom_publicacion
+    FOREIGN KEY (publicacion_id) REFERENCES comunidad_publicaciones (id)
+    ON UPDATE CASCADE ON DELETE CASCADE,
+  CONSTRAINT fk_ccom_usuario
+    FOREIGN KEY (usuario_id) REFERENCES usuarios (id)
+    ON UPDATE CASCADE ON DELETE CASCADE,
+  CONSTRAINT fk_ccom_parent
+    FOREIGN KEY (parent_id) REFERENCES comunidad_comentarios (id)
+    ON UPDATE CASCADE ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS comunidad_conversaciones (
+  id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  publicacion_id INT UNSIGNED NULL,
+  publicacion_titulo VARCHAR(150) NOT NULL,
+  autor_id INT UNSIGNED NOT NULL,
+  interesado_id INT UNSIGNED NOT NULL,
+  fecha_creacion DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE KEY uq_cconv_publicacion_interesado (publicacion_id, interesado_id),
+  KEY idx_cconv_autor (autor_id),
+  KEY idx_cconv_interesado (interesado_id),
+  CONSTRAINT fk_cconv_publicacion
+    FOREIGN KEY (publicacion_id) REFERENCES comunidad_publicaciones (id)
+    ON UPDATE CASCADE ON DELETE SET NULL,
+  CONSTRAINT fk_cconv_autor
+    FOREIGN KEY (autor_id) REFERENCES usuarios (id)
+    ON UPDATE CASCADE ON DELETE CASCADE,
+  CONSTRAINT fk_cconv_interesado
+    FOREIGN KEY (interesado_id) REFERENCES usuarios (id)
+    ON UPDATE CASCADE ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS comunidad_mensajes (
+  id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  conversacion_id INT UNSIGNED NOT NULL,
+  remitente_id INT UNSIGNED NOT NULL,
+  mensaje TEXT NOT NULL,
+  leido TINYINT(1) NOT NULL DEFAULT 0,
+  fecha_creacion DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  KEY idx_cmsg_conversacion (conversacion_id, id),
+  KEY idx_cmsg_no_leidos (conversacion_id, leido, remitente_id),
+  CONSTRAINT fk_cmsg_conversacion
+    FOREIGN KEY (conversacion_id) REFERENCES comunidad_conversaciones (id)
+    ON UPDATE CASCADE ON DELETE CASCADE,
+  CONSTRAINT fk_cmsg_remitente
+    FOREIGN KEY (remitente_id) REFERENCES usuarios (id)
+    ON UPDATE CASCADE ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

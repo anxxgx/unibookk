@@ -39,7 +39,12 @@ $accion =
     $_GET['accion'] ?? 'landing';
 
 /* La landing contiene su propio documento HTML. */
-if ($accion === 'landing') {
+/*
+ * La landing se renderiza solo en peticiones GET. Los formularios antiguos
+ * que aún envían POST a index.php no deben terminar aquí antes de que se
+ * procese su acción (compra, intercambio, eliminar libro, etc.).
+ */
+if ($accion === 'landing' && $_SERVER['REQUEST_METHOD'] === 'GET') {
     $totalesLanding = [
         'libros' => 0,
         'universidades' => 0,
@@ -73,13 +78,12 @@ if (isset($_POST['registrar'])) {
 
     $registroExitoso = $usuarioController->registrar();
 
-    $mensajeRegistro = $registroExitoso ? "
-        <div class='container mt-4'>
-            <div class='ub-alert ub-alert-success'>
-                <i class='bi bi-check-circle-fill ub-icon' aria-hidden='true'></i> Cuenta creada correctamente. Ya puedes iniciar sesión.
-            </div>
-        </div>
-    " : "
+    if ($registroExitoso) {
+        header("Location: index.php?accion=login&registro=exitoso");
+        exit();
+    }
+
+    $mensajeRegistro = "
         <div class='container mt-4'>
             <div class='ub-alert ub-alert-danger'>
                 <i class='bi bi-x-circle-fill ub-icon' aria-hidden='true'></i> No se pudo crear la cuenta. Revisa los datos, usa una contraseña de al menos 8 caracteres y prueba con otro correo.
@@ -681,8 +685,10 @@ switch ($accion) {
             exit();
         }
 
+        // Historia solo muestra publicaciones cuya operación ya terminó.
+        // No se deben mezclar con los últimos libros publicados.
         $historial =
-            $libroController->ultimosIngresados();
+            $libroController->historial();
 
         include "views/historia.php";
 

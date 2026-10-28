@@ -40,6 +40,13 @@
 
             <h2 class="fw-bold mt-2 mb-4">Iniciar sesión</h2>
 
+            <?php if (($_GET['registro'] ?? '') === 'exitoso'): ?>
+                <div class="ub-alert ub-alert-success mb-3" role="status">
+                    <i class="bi bi-check-circle-fill ub-icon" aria-hidden="true"></i>
+                    Cuenta creada correctamente. Ahora puedes iniciar sesión.
+                </div>
+            <?php endif; ?>
+
             <form method="POST">
 
                 <div class="ub-field">

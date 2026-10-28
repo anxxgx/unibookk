@@ -105,7 +105,7 @@ $ubNotifGrupoActual = '';
             </div>
 
             <?php if(!empty($notificaciones)){ ?>
-                <form method="POST" action="index.php">
+                <form method="POST" action="index.php?accion=notificaciones">
                     <input
                         type="hidden"
                         name="marcar_todas_notificaciones"
@@ -234,7 +234,7 @@ $ubNotifGrupoActual = '';
                                     <?php if($noLeida){ ?>
                                         <form
                                             method="POST"
-                                            action="index.php"
+                                            action="index.php?accion=notificaciones"
                                         >
                                             <input
                                                 type="hidden"
