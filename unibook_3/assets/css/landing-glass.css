@@ -1,0 +1,123 @@
+/* ==========================================================================
+   UNIBOOK — Landing con el sistema visual "Glass"
+   --------------------------------------------------------------------------
+   Se carga después de landing.css. La landing ya funciona con variables, así
+   que aquí se redefinen en clave clara/cristal y se ajustan los pocos
+   componentes que tenían colores fijos. No se toca su marcado ni sus
+   contadores animados.
+   ========================================================================== */
+
+:root{
+  --ub-bg:            #dbe7f6;
+  --ub-bg-deep:       #e9eff8;
+  --ub-surface:       rgba(255,255,255,.52);
+  --ub-surface-2:     rgba(255,255,255,.66);
+  --ub-border:        rgba(255,255,255,.88);
+  --ub-border-soft:   rgba(255,255,255,.65);
+  --ub-gold:          #b9945b;
+  --ub-gold-light:    #d9be8e;
+  --ub-gold-dim:      rgba(185,148,91,.35);
+  --ub-text:          #0e3a6b;
+  --ub-text-secondary:#4d6286;
+  --ub-text-tertiary: #7d8da6;
+  --ub-font-display:  'Montserrat','Segoe UI',system-ui,sans-serif;
+  --ub-font-body:     'Montserrat','Segoe UI',system-ui,sans-serif;
+  --ub-font-mono:     'Montserrat','Segoe UI',system-ui,sans-serif;
+  --lg-shadow:        0 14px 40px rgba(46,84,140,.12), 0 2px 8px rgba(46,84,140,.05);
+  --lg-blur:          blur(22px) saturate(150%);
+}
+
+body{
+  background:
+    radial-gradient(55% 45% at 6% 4%,  rgba(255,255,255,.95), transparent 62%),
+    radial-gradient(42% 42% at 96% 22%, rgba(168,192,230,.75), transparent 68%),
+    radial-gradient(46% 40% at 82% 96%, rgba(171,184,208,.8), transparent 66%),
+    radial-gradient(40% 36% at 3% 98%,  rgba(238,226,214,.95), transparent 64%),
+    linear-gradient(162deg, #dbe7f6 0%, #e7eef8 42%, #d6e1f1 100%);
+  background-attachment: fixed;
+}
+
+h1, h2, h3{ font-weight:700; letter-spacing:-.015em; }
+
+/* Iconos: sin animación flotante, como en el resto de la aplicación */
+body .ub-icon{ animation:none; margin-left:0; margin-right:.4em; }
+
+.ub-eyebrow{ font-size:12px; font-weight:600; letter-spacing:0; text-transform:none; }
+.ub-eyebrow::before{ display:none; }
+
+/* ----- Botones ----- */
+.ub-btn{ font-weight:600; }
+.ub-btn--gold{
+  background: linear-gradient(180deg, #164777, #0a2f56);
+  border-color: rgba(255,255,255,.14);
+  color:#fff;
+  box-shadow: 0 8px 20px rgba(11,52,93,.28), inset 0 1px 0 rgba(255,255,255,.18);
+}
+.ub-btn--gold:hover{ box-shadow: 0 14px 28px rgba(11,52,93,.34), inset 0 1px 0 rgba(255,255,255,.2); filter:brightness(1.08); }
+.ub-btn--outline{
+  background: var(--ub-surface-2);
+  color: var(--ub-text);
+  border-color: var(--ub-border);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.9), 0 6px 18px rgba(46,84,140,.10);
+}
+.ub-btn--outline:hover{ background: rgba(255,255,255,.85); border-color:#fff; }
+.ub-btn--ghost{ color: var(--ub-text-secondary); }
+
+/* ----- Navegación ----- */
+.ub-nav.is-scrolled{
+  background: rgba(255,255,255,.55);
+  -webkit-backdrop-filter: var(--lg-blur); backdrop-filter: var(--lg-blur);
+  border-bottom:1px solid var(--ub-border);
+}
+.ub-nav__mark{ background: linear-gradient(135deg,#3a69ab,#0e3a6b); color:#fff; box-shadow:0 4px 10px rgba(30,70,130,.25); }
+.ub-nav__wordmark{ font-family:'Playfair Display','Lora',Georgia,serif; font-weight:700; font-size:21px; color: var(--ub-text); }
+
+/* ----- Hero ----- */
+.ub-hero{
+  background:
+    radial-gradient(60% 50% at 78% 18%, rgba(255,255,255,.7), transparent 60%),
+    linear-gradient(180deg, rgba(222,234,248,.55) 0%, rgba(233,239,248,.2) 100%);
+}
+.ub-hero__glow{ background: radial-gradient(circle, rgba(255,255,255,.85), transparent 65%); }
+.ub-hero__grid{
+  background-image:
+    linear-gradient(rgba(44,111,209,.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(44,111,209,.05) 1px, transparent 1px);
+}
+.ub-hero__title-gold{ background: linear-gradient(120deg, #cfae78, var(--ub-gold) 55%, #9c7a43); -webkit-background-clip:text; background-clip:text; }
+.ub-hero__scroll-cue{ border-color: rgba(14,58,107,.25); }
+
+/* Pila de libros: lomos de libro reales (azul, crema, azul claro) */
+.ub-book-card{
+  border:1px solid rgba(255,255,255,.35);
+  box-shadow: 0 30px 50px -22px rgba(20,50,100,.5), inset 0 1px 0 rgba(255,255,255,.25);
+}
+.ub-book-card--1{ background: linear-gradient(155deg,#2a5fa8,#0e3a6b); }
+.ub-book-card--2{ background: linear-gradient(155deg,#f6f1e4,#e2d3ac); }
+.ub-book-card--3{ background: linear-gradient(155deg,#4a7dc0,#1b4a85); }
+.ub-book-card__tag{ color:#fff; }
+.ub-book-card__price{ color:#e9d4a8; }
+.ub-book-card--2 .ub-book-card__tag{ color: var(--ub-text); }
+.ub-book-card--2 .ub-book-card__price{ color: var(--ub-gold-deep, #9c7a43); }
+.ub-book-card__spine{ background: linear-gradient(180deg,#e2c488,#b98f4f); opacity:.95; }
+
+/* ----- Superficies de cristal ----- */
+.ub-stats{ border-top:0; }
+.ub-stat, .ub-how__step, .ub-benefit-card{
+  background: var(--ub-surface);
+  border:1px solid var(--ub-border);
+  box-shadow: var(--lg-shadow), inset 0 1px 0 rgba(255,255,255,.9);
+  -webkit-backdrop-filter: var(--lg-blur); backdrop-filter: var(--lg-blur);
+}
+.ub-stat__number{ background: linear-gradient(120deg, var(--ub-text), #2c6fd1); -webkit-background-clip:text; background-clip:text; }
+.ub-how__step:hover, .ub-benefit-card:hover{ box-shadow: 0 20px 44px rgba(46,84,140,.18), inset 0 1px 0 #fff; }
+.ub-how__index{ font-weight:700; }
+.ub-benefit-card__icon{ background: rgba(207,226,251,.75); color:#2c6fd1; }
+
+.ub-final-cta{
+  margin:0 28px; border-radius:28px;
+  background: linear-gradient(110deg, rgba(222,234,248,.85), rgba(207,226,251,.6));
+  border:1px solid var(--ub-border);
+  box-shadow: var(--lg-shadow), inset 0 1px 0 rgba(255,255,255,.9);
+}
+.ub-footer p{ color: var(--ub-text-tertiary); }

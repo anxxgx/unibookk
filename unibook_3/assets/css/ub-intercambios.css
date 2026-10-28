@@ -1,0 +1,664 @@
+/* ==========================================================================
+   UNIBOOK — MIS INTERCAMBIOS (recibidos y enviados, glassmorphism)
+   --------------------------------------------------------------------------
+   Hoja AISLADA: solo se enlaza desde views/intercambios_recibidos.php y
+   views/intercambios_enviados.php, y todas sus clases empiezan por .ix, así
+   que no puede afectar a ninguna otra pantalla. Reutiliza los tokens de
+   ub-glass.css (colores, radios, sombras y tema oscuro) y sigue el mismo
+   lenguaje visual que Mis ventas. No usa la clase global .ub-icon.
+
+   Índice
+     0. Tokens locales
+     1. Cabecera
+     2. Pestañas Recibidos / Enviados
+     3. Mensajes
+     4. Lista y tarjeta
+     5. Libros (portadas)
+     6. Fecha, enlace y notas de estado
+     7. Botones y acciones
+     8. Estado vacío
+     9. Animación de entrada
+    10. Contenedor adaptable (según el ancho de cada tarjeta)
+    11. Responsive
+    12. Movimiento reducido
+   ========================================================================== */
+
+
+/* ==========================================================================
+   0. TOKENS LOCALES
+   ========================================================================== */
+
+.ix{
+  --ix-card:      rgba(255,255,255,.64);
+  --ix-card-edge: rgba(255,255,255,.88);
+  --ix-tile:      rgba(255,255,255,.55);
+  --ix-line:      rgba(14,58,107,.10);
+  --ix-ring:      rgba(44,111,209,.55);
+  --ix-ease:      cubic-bezier(.22,.8,.3,1);
+
+  --ix-ok-bg:  rgba(44,138,102,.14);  --ix-ok-fg:  #0f6040;
+  --ix-wa-bg:  rgba(191,127,47,.17);  --ix-wa-fg:  #7a4d0b;
+  --ix-no-bg:  rgba(238,74,94,.13);   --ix-no-fg:  #a8202f;
+  --ix-ne-bg:  rgba(77,98,134,.13);   --ix-ne-fg:  #324a70;
+
+  max-width:1120px;
+  margin:0 auto;
+  padding-bottom:12px;
+  font-family: var(--ub-font);
+}
+
+html[data-theme="dark"] .ix{
+  --ix-card:      rgba(22,40,76,.58);
+  --ix-card-edge: rgba(255,255,255,.14);
+  --ix-tile:      rgba(255,255,255,.07);
+  --ix-line:      rgba(255,255,255,.12);
+  --ix-ring:      rgba(140,185,255,.75);
+
+  --ix-ok-bg:  rgba(111,211,168,.16); --ix-ok-fg:  #8be0bb;
+  --ix-wa-bg:  rgba(240,180,98,.17);  --ix-wa-fg:  #f4c680;
+  --ix-no-bg:  rgba(255,120,138,.16); --ix-no-fg:  #ff9aa8;
+  --ix-ne-bg:  rgba(255,255,255,.10); --ix-ne-fg:  #c3d3ee;
+}
+
+
+/* ==========================================================================
+   1. CABECERA
+   ========================================================================== */
+
+.ix-hero{
+  position:relative; isolation:isolate; overflow:hidden;
+  padding:30px 36px 28px;
+  border-radius:32px;
+  border:1px solid var(--ix-card-edge);
+  background:
+    radial-gradient(46% 70% at 8% 0%,    rgba(64,124,226,.30), transparent 70%),
+    radial-gradient(40% 60% at 96% 12%,  rgba(222,176,104,.30), transparent 70%),
+    radial-gradient(44% 60% at 70% 104%, rgba(124,150,226,.26), transparent 70%),
+    linear-gradient(168deg, rgba(255,255,255,.74), rgba(228,238,251,.58));
+  box-shadow: 0 26px 64px rgba(46,84,140,.16), inset 0 1px 0 rgba(255,255,255,.95);
+}
+html[data-theme="dark"] .ix-hero{
+  background:
+    radial-gradient(46% 70% at 8% 0%,    rgba(64,124,226,.34), transparent 70%),
+    radial-gradient(40% 60% at 96% 12%,  rgba(185,148,91,.24), transparent 70%),
+    linear-gradient(168deg, rgba(24,44,84,.72), rgba(14,28,58,.62));
+  box-shadow: 0 26px 64px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.10);
+}
+
+/* Orbe de cristal decorativo */
+.ix-hero::before{
+  content:""; position:absolute; z-index:-1;
+  right:-70px; top:-100px; width:300px; height:300px; border-radius:50%;
+  background: radial-gradient(circle at 30% 28%, rgba(255,255,255,.85), rgba(255,255,255,.12) 62%, transparent 70%);
+  border:1px solid rgba(255,255,255,.7);
+  opacity:.7;
+}
+html[data-theme="dark"] .ix-hero::before{
+  background: radial-gradient(circle at 30% 28%, rgba(255,255,255,.18), rgba(255,255,255,.03) 62%, transparent 70%);
+  border-color: rgba(255,255,255,.14);
+}
+
+.ix-hero::after{
+  content:""; position:absolute; z-index:-1; pointer-events:none;
+  left:0; right:0; top:0; height:46%;
+  background: linear-gradient(180deg, rgba(255,255,255,.5), rgba(255,255,255,0));
+  border-radius:inherit;
+  opacity:.55;
+}
+html[data-theme="dark"] .ix-hero::after{ background: linear-gradient(180deg, rgba(160,196,255,.12), rgba(160,196,255,0)); opacity:1; }
+
+.ix-hero__top{
+  display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;
+}
+
+.ix-chip{
+  display:inline-flex; align-items:center; gap:7px;
+  padding:7px 14px; border-radius:999px;
+  background: rgba(255,255,255,.62);
+  border:1px solid var(--ix-card-edge);
+  box-shadow: 0 4px 14px rgba(46,84,140,.08), inset 0 1px 0 rgba(255,255,255,.9);
+  -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
+  font:600 12px/1 var(--ub-font); color: var(--ub-navy);
+}
+.ix-chip i{ color: var(--ub-blue); font-size:14px; }
+html[data-theme="dark"] .ix-chip{ background: rgba(255,255,255,.08); }
+
+.ix .ix-title{
+  margin:16px 0 10px;
+  font-family: var(--ub-font-brand);
+  font-weight:700;
+  font-size: clamp(34px, 5vw, 52px);
+  line-height:1.05;
+  letter-spacing:-.025em;
+  color: var(--ub-navy);
+}
+.ix .ix-lead{
+  max-width:58ch; margin:0;
+  font-size:15px; line-height:1.6; font-weight:500;
+  color: var(--ub-slate);
+}
+
+
+/* ==========================================================================
+   2. PESTAÑAS RECIBIDOS / ENVIADOS
+   ========================================================================== */
+
+.ix-tabs{
+  display:inline-flex; gap:4px;
+  margin-top:24px; padding:5px;
+  max-width:100%;
+  border-radius:999px;
+  background: rgba(255,255,255,.46);
+  border:1px solid var(--ix-card-edge);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.9), 0 8px 22px rgba(46,84,140,.10);
+  -webkit-backdrop-filter: blur(20px) saturate(170%); backdrop-filter: blur(20px) saturate(170%);
+}
+html[data-theme="dark"] .ix-tabs{
+  background: rgba(255,255,255,.06);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.08), 0 8px 22px rgba(0,0,0,.3);
+}
+
+body.ub-glass .ix a.ix-tab{
+  display:inline-flex; align-items:center; gap:9px;
+  min-height:46px; padding:0 14px 0 18px;
+  border:1px solid transparent; border-radius:999px;
+  font:700 14px/1 var(--ub-font);
+  color: var(--ub-slate);
+  text-decoration:none; white-space:nowrap;
+  -webkit-tap-highlight-color: transparent; touch-action: manipulation;
+  transition: background .22s ease, color .2s ease, box-shadow .22s ease, transform .2s var(--ix-ease);
+}
+body.ub-glass .ix a.ix-tab i{ font-size:16px; line-height:1; }
+
+@media (hover:hover){
+  body.ub-glass .ix a.ix-tab:hover{ color: var(--ub-navy); background: rgba(255,255,255,.55); }
+  html[data-theme="dark"] body.ub-glass .ix a.ix-tab:hover{ background: rgba(255,255,255,.08); }
+}
+body.ub-glass .ix a.ix-tab:active{ transform: scale(.97); }
+body.ub-glass .ix a.ix-tab:focus-visible{ outline:3px solid var(--ix-ring); outline-offset:2px; }
+
+body.ub-glass .ix a.ix-tab.is-active{
+  color: var(--ub-navy);
+  background: linear-gradient(180deg, #fff, rgba(236,244,255,.92));
+  border-color: rgba(255,255,255,.95);
+  box-shadow: 0 8px 20px rgba(46,84,140,.18), inset 0 1px 0 #fff;
+}
+body.ub-glass .ix a.ix-tab.is-active i{ color: var(--ub-blue); }
+html[data-theme="dark"] body.ub-glass .ix a.ix-tab.is-active{
+  background: linear-gradient(180deg, rgba(74,120,196,.65), rgba(40,70,124,.75));
+  border-color: rgba(160,196,255,.3);
+  box-shadow: 0 8px 20px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.14);
+}
+html[data-theme="dark"] body.ub-glass .ix a.ix-tab.is-active i{ color:#cfe2ff; }
+
+.ix-tab__count{
+  display:inline-grid; place-items:center;
+  min-width:26px; height:24px; padding:0 8px;
+  border-radius:999px;
+  background: rgba(77,98,134,.14); color: var(--ub-slate);
+  font:800 12px/1 var(--ub-font); font-variant-numeric: tabular-nums;
+  transition: background .2s ease, color .2s ease;
+}
+body.ub-glass .ix a.ix-tab.is-active .ix-tab__count{
+  background: linear-gradient(180deg, #2f74d6, #1a4a8c); color:#fff;
+  box-shadow: 0 3px 8px rgba(26,74,140,.3);
+}
+
+
+/* ==========================================================================
+   3. MENSAJES
+   ========================================================================== */
+
+.ix-alert{
+  display:flex; align-items:flex-start; gap:12px;
+  margin-top:18px; padding:15px 20px;
+  border-radius:20px;
+  border:1px solid var(--ix-card-edge);
+  background: var(--ix-card);
+  box-shadow: var(--ub-shadow-sm), inset 0 1px 0 rgba(255,255,255,.9);
+  -webkit-backdrop-filter: blur(20px) saturate(170%); backdrop-filter: blur(20px) saturate(170%);
+  font-size:13.5px; line-height:1.5; color: var(--ub-slate);
+}
+.ix-alert > i{ flex:none; margin-top:1px; font-size:18px; line-height:1.2; }
+.ix-alert strong{ display:block; font-weight:700; color: var(--ub-navy); }
+.ix-alert--success{ background: linear-gradient(0deg, var(--ix-ok-bg), var(--ix-ok-bg)), var(--ix-card); }
+.ix-alert--success > i{ color: var(--ix-ok-fg); }
+.ix-alert--warning{ background: linear-gradient(0deg, var(--ix-wa-bg), var(--ix-wa-bg)), var(--ix-card); }
+.ix-alert--warning > i{ color: var(--ix-wa-fg); }
+.ix-alert--danger { background: linear-gradient(0deg, var(--ix-no-bg), var(--ix-no-bg)), var(--ix-card); }
+.ix-alert--danger > i{ color: var(--ix-no-fg); }
+
+
+/* ==========================================================================
+   4. LISTA Y TARJETA
+   ========================================================================== */
+
+.ix-listhead{
+  display:flex; align-items:baseline; justify-content:space-between; gap:6px 14px; flex-wrap:wrap;
+  margin:30px 6px 14px;
+}
+.ix .ix-listhead h2{
+  margin:0; font:700 19px/1.2 var(--ub-font); letter-spacing:-.01em; color: var(--ub-navy);
+}
+.ix-listhead p{ margin:0; font-size:13.5px; color: var(--ub-slate); }
+.ix-listhead strong{ color: var(--ub-navy); }
+.ix-listhead .ix-listhead__alert{ color: var(--ix-wa-fg); }
+
+.ix-list{
+  list-style:none; margin:0; padding:0;
+  display:grid; gap:18px;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 440px), 1fr));
+}
+.ix-item{ min-width:0; container-type:inline-size; }
+
+.ix-card{
+  position:relative; isolation:isolate; overflow:hidden; height:100%;
+  display:flex; flex-direction:column; gap:18px;
+  padding:20px;
+  border-radius:28px;
+  background: var(--ix-card);
+  background-image: var(--ub-sheen);
+  border:1px solid var(--ix-card-edge);
+  box-shadow: var(--ub-shadow-sm), inset 0 1px 0 rgba(255,255,255,.95);
+  -webkit-backdrop-filter: blur(24px) saturate(180%); backdrop-filter: blur(24px) saturate(180%);
+  transition: transform .28s var(--ix-ease), box-shadow .28s ease, border-color .28s ease;
+}
+html[data-theme="dark"] .ix-card{ box-shadow: 0 14px 34px rgba(0,0,0,.30), inset 0 1px 0 rgba(255,255,255,.08); }
+
+@media (hover:hover){
+  .ix-card:hover{
+    transform: translateY(-3px);
+    border-color:#fff;
+    box-shadow: var(--ub-shadow), inset 0 1px 0 #fff;
+  }
+  html[data-theme="dark"] .ix-card:hover{ border-color: rgba(255,255,255,.28); }
+}
+.ix-card:focus-within{ border-color: var(--ix-ring); }
+
+/* Reflejo de cristal: brillo diagonal fijo y un barrido suave al pasar el cursor */
+.ix-card::after{
+  content:""; position:absolute; z-index:-1; pointer-events:none;
+  inset:0; border-radius:inherit;
+  background:
+    linear-gradient(118deg, rgba(255,255,255,.55) 0%, rgba(255,255,255,.12) 26%, rgba(255,255,255,0) 44%),
+    radial-gradient(60% 40% at 100% 0%, rgba(255,255,255,.35), transparent 70%);
+  opacity:.8;
+  transition: opacity .4s ease;
+}
+html[data-theme="dark"] .ix-card::after{
+  background:
+    linear-gradient(118deg, rgba(160,196,255,.14) 0%, rgba(160,196,255,.04) 26%, rgba(160,196,255,0) 44%),
+    radial-gradient(60% 40% at 100% 0%, rgba(160,196,255,.10), transparent 70%);
+}
+@media (hover:hover){
+  .ix-card:hover::after{ opacity:1; }
+}
+
+/* Franja de color según el estado */
+.ix-card::before{
+  content:""; position:absolute; left:26px; right:26px; top:0; height:3px;
+  border-radius:0 0 4px 4px; opacity:.85;
+  background: var(--ix-ne-fg);
+}
+.ix-card--warning::before{ background: linear-gradient(90deg, #d9a14e, #efc477); }
+.ix-card--success::before{ background: linear-gradient(90deg, #2c8a66, #5cc49b); }
+.ix-card--danger::before { background: linear-gradient(90deg, #e0495b, #f08a97); }
+
+.ix-card__top{
+  display:flex; align-items:center; justify-content:space-between; gap:10px;
+}
+
+.ix-user{ display:flex; align-items:center; gap:12px; min-width:0; }
+.ix-user__avatar{
+  flex:none; display:grid; place-items:center;
+  width:44px; height:44px; border-radius:50%;
+  background: linear-gradient(145deg, #5b8fd8, #1a4a8c);
+  border:2px solid rgba(255,255,255,.95);
+  box-shadow: 0 8px 18px rgba(26,74,140,.28);
+  font:700 17px/1 var(--ub-font); color:#fff;
+}
+.ix-user__text{ display:flex; flex-direction:column; gap:3px; min-width:0; }
+.ix-user__role{ font:600 11.5px/1 var(--ub-font); color: var(--ub-slate); }
+.ix-user__name{
+  font:700 15.5px/1.2 var(--ub-font); color: var(--ub-navy);
+  overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+}
+
+.ix-status{
+  flex:none;
+  display:inline-flex; align-items:center; gap:6px;
+  padding:7px 13px 7px 11px; border-radius:999px;
+  font:700 12px/1 var(--ub-font);
+}
+.ix-status i{ font-size:13px; line-height:1; }
+.ix-status--success{ background: var(--ix-ok-bg); color: var(--ix-ok-fg); }
+.ix-status--warning{ background: var(--ix-wa-bg); color: var(--ix-wa-fg); }
+.ix-status--danger { background: var(--ix-no-bg); color: var(--ix-no-fg); }
+.ix-status--neutral{ background: var(--ix-ne-bg); color: var(--ix-ne-fg); }
+
+
+/* ==========================================================================
+   5. LIBROS (PORTADAS)
+   ========================================================================== */
+
+.ix-swap{
+  display:grid; align-items:stretch; gap:10px;
+  grid-template-columns: minmax(0,1fr) auto minmax(0,1fr);
+}
+
+body.ub-glass .ix a.ix-book{
+  display:flex; flex-direction:column; align-items:center; gap:12px;
+  min-width:0; padding:16px 12px 14px;
+  border-radius:22px;
+  background: var(--ix-tile);
+  border:1px solid var(--ix-card-edge);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.9);
+  text-align:center; text-decoration:none;
+  color: var(--ub-navy);
+  -webkit-tap-highlight-color: transparent;
+  transition: transform .25s var(--ix-ease), box-shadow .25s ease, background .2s ease, border-color .2s ease;
+}
+body.ub-glass .ix a.ix-book--offer{
+  background: linear-gradient(180deg, rgba(207,226,251,.62), rgba(255,255,255,.4));
+  border-color: rgba(44,111,209,.20);
+}
+html[data-theme="dark"] body.ub-glass .ix a.ix-book{ box-shadow: inset 0 1px 0 rgba(255,255,255,.06); }
+html[data-theme="dark"] body.ub-glass .ix a.ix-book--offer{
+  background: linear-gradient(180deg, rgba(90,140,220,.2), rgba(255,255,255,.04));
+  border-color: rgba(140,185,255,.25);
+}
+
+@media (hover:hover){
+  body.ub-glass .ix a.ix-book:hover{
+    transform: translateY(-2px);
+    background: var(--ub-glass-3);
+    border-color:#fff;
+    box-shadow: 0 14px 28px rgba(46,84,140,.16), inset 0 1px 0 #fff;
+    color: var(--ub-navy);
+  }
+  html[data-theme="dark"] body.ub-glass .ix a.ix-book:hover{ border-color: rgba(255,255,255,.3); }
+}
+body.ub-glass .ix a.ix-book:active{ transform: scale(.98); }
+body.ub-glass .ix a.ix-book:focus-visible{ outline:3px solid var(--ix-ring); outline-offset:3px; }
+
+.ix-book__cover{
+  position:relative; display:block; flex:none;
+  width:min(100%, 96px); aspect-ratio:3 / 4;
+  overflow:hidden; border-radius:12px;
+  background: linear-gradient(160deg, rgba(207,226,251,.9), rgba(244,232,210,.8));
+  border:1px solid rgba(255,255,255,.9);
+  box-shadow: 0 12px 24px rgba(11,52,93,.22), 0 2px 5px rgba(11,52,93,.10);
+}
+html[data-theme="dark"] .ix-book__cover{
+  background: linear-gradient(160deg, rgba(60,104,176,.35), rgba(185,148,91,.22));
+  border-color: rgba(255,255,255,.14);
+}
+.ix-book__cover img{ display:block; width:100%; height:100%; object-fit:cover; }
+.ix-book__none{
+  position:absolute; inset:0;
+  display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px;
+  padding:6px; text-align:center;
+  font:600 10.5px/1.25 var(--ub-font); color: var(--ub-slate);
+}
+.ix-book__none i{ font-size:22px; color: var(--ub-blue); opacity:.75; }
+
+.ix-book__info{ display:flex; flex-direction:column; gap:5px; min-width:0; width:100%; }
+.ix-book__label{ font:700 10.5px/1.2 var(--ub-font); letter-spacing:.06em; text-transform:uppercase; color: var(--ub-gold-deep); }
+.ix-book__title{
+  font:700 14px/1.3 var(--ub-font); color: var(--ub-navy);
+  overflow-wrap:anywhere;
+  display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden;
+}
+
+.ix-swap__icon{
+  align-self:center;
+  display:grid; place-items:center;
+  width:40px; height:40px; border-radius:50%;
+  background: var(--ub-glass-3);
+  border:1px solid var(--ix-card-edge);
+  box-shadow: var(--ub-shadow-sm), inset 0 1px 0 rgba(255,255,255,.95);
+  color: var(--ub-blue); font-size:17px;
+}
+
+
+/* ==========================================================================
+   6. FECHA, ENLACE Y NOTAS DE ESTADO
+   ========================================================================== */
+
+.ix-card__meta{
+  display:flex; align-items:center; justify-content:space-between; gap:8px 14px; flex-wrap:wrap;
+  padding-top:16px; border-top:1px solid var(--ix-line);
+}
+.ix-date{
+  display:inline-flex; align-items:center; gap:8px;
+  font:600 12.5px/1.2 var(--ub-font); color: var(--ub-slate);
+}
+.ix-date i{ color: var(--ub-blue); font-size:14px; }
+
+body.ub-glass .ix a.ix-link{
+  display:inline-flex; align-items:center; gap:6px;
+  padding:6px 4px; border-radius:8px;
+  font:700 12.5px/1.2 var(--ub-font); color: var(--ub-blue);
+  text-decoration:none;
+  transition: color .2s ease, gap .2s ease;
+}
+body.ub-glass .ix a.ix-link i{ font-size:12px; transition: transform .2s ease; }
+@media (hover:hover){
+  body.ub-glass .ix a.ix-link:hover{ color: var(--ub-navy); }
+  body.ub-glass .ix a.ix-link:hover i{ transform: translate(2px,-2px); }
+}
+body.ub-glass .ix a.ix-link:focus-visible{ outline:3px solid var(--ix-ring); outline-offset:2px; }
+
+.ix-note{
+  display:flex; align-items:center; gap:10px;
+  margin:0; padding:12px 16px; border-radius:16px;
+  font:600 13px/1.4 var(--ub-font);
+}
+.ix-note i{ flex:none; font-size:16px; }
+.ix-note--warning{ background: var(--ix-wa-bg); color: var(--ix-wa-fg); }
+.ix-note--success{ background: var(--ix-ok-bg); color: var(--ix-ok-fg); }
+.ix-note--danger { background: var(--ix-no-bg); color: var(--ix-no-fg); }
+
+
+/* ==========================================================================
+   7. BOTONES Y ACCIONES
+   ========================================================================== */
+
+.ix-actions{
+  display:grid; gap:10px;
+  grid-template-columns: repeat(2, minmax(0,1fr));
+}
+.ix-actions form{ margin:0; }
+
+/* Selector reforzado para ganar a los estilos globales de enlaces y botones */
+body.ub-glass .ix .ix-btn{
+  position:relative; overflow:hidden; isolation:isolate;
+  display:inline-flex; align-items:center; justify-content:center; gap:9px;
+  width:auto; min-height:46px; padding:12px 24px;
+  border:1px solid transparent; border-radius:999px;
+  font:700 14px/1 var(--ub-font); letter-spacing:.005em;
+  text-decoration:none; cursor:pointer;
+  -webkit-tap-highlight-color: transparent; touch-action: manipulation;
+  transition: transform .22s var(--ix-ease), box-shadow .22s ease, filter .22s ease, background .2s ease, color .2s ease, border-color .2s ease;
+}
+body.ub-glass .ix .ix-actions .ix-btn{ width:100%; }
+body.ub-glass .ix .ix-btn i{ font-size:15px; line-height:1; transition: transform .25s var(--ix-ease); }
+
+/* Destello que cruza el botón al pasar el cursor o al enfocarlo */
+body.ub-glass .ix .ix-btn::after{
+  content:""; position:absolute; z-index:-1; pointer-events:none;
+  top:0; bottom:0; left:-60%; width:45%;
+  background: linear-gradient(100deg, transparent, rgba(255,255,255,.45), transparent);
+  transform: skewX(-18deg) translateX(0);
+  opacity:0;
+}
+@media (hover:hover){
+  body.ub-glass .ix .ix-btn:hover::after{ opacity:1; animation: ixShine .7s var(--ix-ease) both; }
+  body.ub-glass .ix .ix-btn--accept:hover i{ transform: scale(1.18) rotate(-6deg); }
+  body.ub-glass .ix .ix-btn--reject:hover i{ transform: rotate(90deg); }
+  body.ub-glass .ix .ix-btn--primary:hover i,
+  body.ub-glass .ix .ix-btn--glass:hover i{ transform: translateX(2px); }
+}
+body.ub-glass .ix .ix-btn:focus-visible::after{ opacity:1; animation: ixShine .7s var(--ix-ease) both; }
+@keyframes ixShine{
+  from{ transform: skewX(-18deg) translateX(0); }
+  to  { transform: skewX(-18deg) translateX(520%); }
+}
+body.ub-glass .ix .ix-btn:active{ transform: translateY(0) scale(.97); filter:brightness(.96); }
+body.ub-glass .ix .ix-btn:focus-visible{ outline:3px solid var(--ix-ring); outline-offset:3px; }
+
+/* Principal (azul marino) */
+body.ub-glass .ix .ix-btn--primary{
+  background: linear-gradient(180deg, #1c5a96 0%, #0a2f56 100%);
+  color:#fff;
+  box-shadow: 0 10px 22px rgba(11,52,93,.30), inset 0 1px 0 rgba(255,255,255,.22);
+}
+html[data-theme="dark"] body.ub-glass .ix .ix-btn--primary{ background: linear-gradient(180deg, #2f6fb5 0%, #17457c 100%); }
+
+/* Aceptar (verde) */
+body.ub-glass .ix .ix-btn--accept{
+  background: linear-gradient(180deg, #38a77d 0%, #1f7556 100%);
+  color:#fff;
+  box-shadow: 0 10px 22px rgba(33,122,88,.28), inset 0 1px 0 rgba(255,255,255,.25);
+}
+
+/* Rechazar (vidrio rojizo) */
+body.ub-glass .ix .ix-btn--reject{
+  background: var(--ix-no-bg);
+  border-color: rgba(238,74,94,.32);
+  color: var(--ix-no-fg);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.6);
+}
+
+/* Vidrio neutro (Ver catálogo) */
+body.ub-glass .ix .ix-btn--glass{
+  background: rgba(255,255,255,.62);
+  border-color: var(--ix-card-edge);
+  color: var(--ub-navy);
+  box-shadow: 0 6px 16px rgba(46,84,140,.12), inset 0 1px 0 rgba(255,255,255,.95);
+  -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
+}
+html[data-theme="dark"] body.ub-glass .ix .ix-btn--glass{ background: rgba(255,255,255,.08); }
+
+body.ub-glass .ix .ix-btn--sm{ min-height:40px; padding:0 18px; font-size:13px; }
+
+@media (hover:hover){
+  body.ub-glass .ix .ix-btn--primary:hover,
+  body.ub-glass .ix .ix-btn--accept:hover{
+    color:#fff; filter:brightness(1.08); transform: translateY(-2px);
+    box-shadow: 0 14px 28px rgba(11,52,93,.34), inset 0 1px 0 rgba(255,255,255,.26);
+  }
+  body.ub-glass .ix .ix-btn--reject:hover{
+    background: linear-gradient(180deg, #ee4a5e, #c2303f);
+    border-color: transparent; color:#fff; transform: translateY(-2px);
+    box-shadow: 0 12px 24px rgba(194,48,63,.28);
+  }
+  body.ub-glass .ix .ix-btn--glass:hover{
+    background:#fff; color: var(--ub-navy); transform: translateY(-2px);
+    box-shadow: 0 12px 24px rgba(46,84,140,.18), inset 0 1px 0 #fff;
+  }
+  html[data-theme="dark"] body.ub-glass .ix .ix-btn--glass:hover{ background: rgba(255,255,255,.16); color: var(--ub-navy); }
+}
+
+
+/* ==========================================================================
+   8. ESTADO VACÍO
+   ========================================================================== */
+
+.ix-empty{
+  position:relative; isolation:isolate; overflow:hidden;
+  margin-top:22px; padding:48px 26px 52px;
+  display:flex; flex-direction:column; align-items:center; text-align:center;
+  border-radius:32px;
+  background:
+    radial-gradient(50% 60% at 50% 0%, rgba(64,124,226,.16), transparent 70%),
+    var(--ix-card);
+  border:1px solid var(--ix-card-edge);
+  box-shadow: var(--ub-shadow-sm), inset 0 1px 0 rgba(255,255,255,.95);
+  -webkit-backdrop-filter: blur(24px) saturate(180%); backdrop-filter: blur(24px) saturate(180%);
+}
+.ix-empty__art{
+  position:relative; width:132px; height:132px; margin-bottom:22px;
+  display:grid; place-items:center;
+}
+.ix-empty__ring{
+  position:absolute; border-radius:50%; border:1px solid rgba(255,255,255,.9);
+  background: radial-gradient(circle at 30% 26%, rgba(255,255,255,.8), rgba(207,226,251,.35));
+  box-shadow: 0 12px 30px rgba(46,84,140,.14);
+}
+.ix-empty__ring--outer{ inset:0; opacity:.6; }
+.ix-empty__ring--inner{ inset:20px; }
+.ix-empty__icon{ position:relative; font-size:40px; line-height:1; color: var(--ub-blue); }
+html[data-theme="dark"] .ix-empty__ring{
+  border-color: rgba(255,255,255,.14);
+  background: radial-gradient(circle at 30% 26%, rgba(255,255,255,.14), rgba(90,140,220,.10));
+  box-shadow:none;
+}
+.ix .ix-empty h2{
+  margin:0 0 8px; font:700 22px/1.2 var(--ub-font); letter-spacing:-.015em; color: var(--ub-navy);
+}
+.ix-empty p{
+  max-width:46ch; margin:0 0 24px; font-size:14.5px; line-height:1.6; color: var(--ub-slate);
+}
+
+
+/* ==========================================================================
+   9. ANIMACIÓN DE ENTRADA (una sola, escalonada y breve)
+   ========================================================================== */
+
+.ix-rise{
+  animation: ixRise .6s var(--ix-ease) both;
+  animation-delay: calc(var(--i, 0) * 70ms);
+}
+@keyframes ixRise{
+  from{ opacity:0; transform: translateY(14px); }
+  to  { opacity:1; transform:none; }
+}
+
+
+/* ==========================================================================
+   10. CONTENEDOR ADAPTABLE (según el ancho de CADA tarjeta)
+   ========================================================================== */
+
+/* Tarjeta estrecha: los libros se apilan, con la portada a la izquierda */
+@container (max-width: 400px){
+  .ix-card{ padding:16px; border-radius:24px; gap:16px; }
+  .ix-swap{ grid-template-columns: 1fr; gap:8px; }
+  body.ub-glass .ix a.ix-book{ flex-direction:row; align-items:center; text-align:left; padding:12px; }
+  .ix-book__cover{ width:62px; }
+  .ix-swap__icon{ width:34px; height:34px; font-size:15px; justify-self:center; }
+  .ix-swap__icon i{ display:block; transform: rotate(90deg); }
+  .ix-actions{ grid-template-columns: 1fr; }
+}
+
+
+/* ==========================================================================
+   11. RESPONSIVE
+   ========================================================================== */
+
+@media (max-width: 720px){
+  .ix-hero{ padding:24px 20px 20px; border-radius:26px; }
+  .ix-hero::before{ width:210px; height:210px; right:-60px; top:-80px; }
+  .ix-tabs{ display:flex; width:100%; }
+  body.ub-glass .ix a.ix-tab{ flex:1 1 0; justify-content:center; padding:0 10px; gap:7px; }
+  .ix-listhead{ margin-top:26px; }
+  .ix-empty{ padding:38px 20px 42px; border-radius:26px; }
+}
+
+@media (max-width: 380px){
+  body.ub-glass .ix a.ix-tab i{ display:none; }
+}
+
+
+/* ==========================================================================
+   12. MOVIMIENTO REDUCIDO
+   ========================================================================== */
+
+@media (prefers-reduced-motion: reduce){
+  .ix-rise{ animation:none; }
+  body.ub-glass .ix .ix-btn::after{ display:none; }
+  body.ub-glass .ix .ix-btn i{ transition:none; }
+  .ix-card, body.ub-glass .ix a.ix-book, body.ub-glass .ix .ix-btn, body.ub-glass .ix a.ix-tab,
+  body.ub-glass .ix a.ix-link, body.ub-glass .ix a.ix-link i{ transition:none; }
+  .ix-card:hover, body.ub-glass .ix a.ix-book:hover, body.ub-glass .ix .ix-btn:hover{ transform:none; }
+}

@@ -1,0 +1,901 @@
+/* ==========================================================================
+   UNIBOOK — Sistema de diseño
+   "Biblioteca de élite": tinta, papel y latón. No app azul genérica.
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Manrope:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap');
+
+:root{
+  /* --- Color: tinta / papel / latón --- */
+  --ink:        #0B0E14;   /* fondo oscuro dominante */
+  --ink-soft:   #131A24;   /* tarjetas sobre fondo oscuro */
+  --ink-line:   #232B38;   /* bordes sutiles sobre oscuro */
+
+  --paper:      #FAF8F3;   /* fondo claro cálido */
+  --paper-dim:  #F1ECE1;   /* secciones alternas claras */
+  --paper-line: #E4DDCC;   /* bordes sobre claro */
+
+  --gold:       #C6A15B;   /* latón — acento primario */
+  --gold-bright:#E3C378;   /* hover / brillo */
+  --gold-deep:  #9C7B3D;   /* texto sobre claro con acento */
+
+  --text-ink:   #1B2430;   /* texto principal sobre papel */
+  --text-muted: #6B7280;   /* texto secundario */
+  --text-paper: #F4F1E8;   /* texto principal sobre tinta */
+  --text-paper-muted: #A9AFBC;
+
+  --success:    #2F6B4F;
+  --success-bg: #E7F0EA;
+  --danger:     #B3432B;
+  --danger-bg:  #F6E7E1;
+
+  /* --- Tipografía --- */
+  --font-display: 'Fraunces', Georgia, serif;
+  --font-body:    'Manrope', -apple-system, sans-serif;
+  --font-mono:    'IBM Plex Mono', monospace;
+
+  /* --- Forma --- */
+  --radius-sm:  8px;
+  --radius:     14px;
+  --radius-lg:  22px;
+  --shadow-soft: 0 1px 2px rgba(11,14,20,0.04), 0 8px 24px rgba(11,14,20,0.06);
+  --shadow-lift: 0 4px 10px rgba(11,14,20,0.08), 0 20px 40px rgba(11,14,20,0.12);
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+*{ box-sizing: border-box; }
+
+html{ scroll-behavior: smooth; }
+
+body{
+  font-family: var(--font-body);
+  background: var(--paper);
+  color: var(--text-ink);
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,h2,h3,h4,h5{
+  font-family: var(--font-display);
+  letter-spacing: -0.01em;
+}
+
+a{ text-decoration: none; }
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce){
+  *{ animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; scroll-behavior: auto !important; }
+}
+
+/* ==========================================================================
+   Eyebrow / índice de catálogo (elemento de estructura con sentido real:
+   simula un número de clasificación bibliotecaria)
+   ========================================================================== */
+.ub-eyebrow{
+  display:inline-flex;
+  align-items:center;
+  gap:10px;
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--gold-deep);
+}
+.ub-eyebrow::before{
+  content:"";
+  width:22px; height:1px;
+  background: var(--gold);
+}
+.on-dark .ub-eyebrow{ color: var(--gold-bright); }
+
+/* ==========================================================================
+   Navbar
+   ========================================================================== */
+.ub-nav{
+  background: var(--ink);
+  border-bottom: 1px solid var(--ink-line);
+  padding: 14px 0;
+  transition: box-shadow 0.3s var(--ease);
+}
+.ub-nav.is-scrolled{ box-shadow: var(--shadow-lift); }
+.ub-nav .navbar-brand{
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 22px;
+  color: var(--text-paper) !important;
+  display:flex; align-items:center; gap:8px;
+}
+.ub-nav .navbar-brand .mark{ color: var(--gold); }
+.ub-nav .nav-link{
+  color: var(--text-paper-muted) !important;
+  font-weight: 500;
+  font-size: 14.5px;
+  padding: 8px 16px !important;
+  border-radius: var(--radius-sm);
+  transition: color .2s var(--ease), background .2s var(--ease);
+}
+.ub-nav .nav-link:hover{ color: var(--text-paper) !important; background: rgba(255,255,255,0.05); }
+.ub-nav .navbar-toggler{ border-color: var(--ink-line); }
+.ub-nav .navbar-toggler-icon{
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(244,241,232,0.85)' stroke-width='2' stroke-linecap='round' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+}
+
+/* ==========================================================================
+   Botones
+   ========================================================================== */
+.btn-ub{
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 14.5px;
+  padding: 12px 26px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  transition: transform .25s var(--ease), box-shadow .25s var(--ease), background .25s var(--ease), color .25s var(--ease);
+  display:inline-flex; align-items:center; justify-content:center; gap:8px;
+}
+.btn-ub-gold{
+  background: linear-gradient(180deg, var(--gold-bright), var(--gold));
+  color: var(--ink);
+}
+.btn-ub-gold:hover{ transform: translateY(-2px); box-shadow: 0 10px 24px rgba(198,161,91,0.35); color: var(--ink); }
+
+.btn-ub-dark{
+  background: var(--ink);
+  color: var(--text-paper);
+}
+.btn-ub-dark:hover{ transform: translateY(-2px); box-shadow: var(--shadow-lift); color: var(--text-paper); background:#1A2230; }
+
+.btn-ub-outline{
+  background: transparent;
+  border-color: var(--ink-line);
+  color: var(--text-ink);
+}
+.btn-ub-outline.on-dark{ border-color: rgba(244,241,232,0.25); color: var(--text-paper); }
+.btn-ub-outline:hover{ border-color: var(--gold); color: var(--gold-deep); }
+.btn-ub-outline.on-dark:hover{ color: var(--gold-bright); }
+
+.btn-ub-danger{
+  background: transparent;
+  border-color: var(--danger);
+  color: var(--danger);
+}
+.btn-ub-danger:hover{ background: var(--danger); color:#fff; }
+
+.btn-ub-sm{ padding: 8px 18px; font-size: 13px; }
+.btn-ub-block{ width: 100%; }
+
+/* ==========================================================================
+   Tarjetas
+   ========================================================================== */
+.ub-card{
+  background:#fff;
+  border: 1px solid var(--paper-line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-soft);
+  transition: transform .35s var(--ease), box-shadow .35s var(--ease);
+}
+.ub-card-hover:hover{
+  transform: translateY(-6px);
+  box-shadow: var(--shadow-lift);
+}
+
+/* Tarjeta de libro (catálogo) */
+.book-card{
+  background:#fff;
+  border: 1px solid var(--paper-line);
+  border-radius: var(--radius);
+  overflow: hidden;
+  height: 100%;
+  display:flex; flex-direction:column;
+  transition: transform .4s var(--ease), box-shadow .4s var(--ease), border-color .4s var(--ease);
+}
+.book-card:hover{
+  transform: translateY(-8px);
+  box-shadow: var(--shadow-lift);
+  border-color: var(--gold);
+}
+.book-card .cover{
+  position:relative;
+  height: 230px;
+  overflow:hidden;
+  background: linear-gradient(135deg, var(--ink-soft), var(--ink));
+}
+.book-card .cover img{
+  width:100%; height:100%; object-fit:cover;
+  transition: transform .6s var(--ease);
+}
+.book-card:hover .cover img{ transform: scale(1.06); }
+.book-card .cover .no-image{
+  width:100%; height:100%;
+  display:flex; align-items:center; justify-content:center;
+  font-family: var(--font-display);
+  font-size: 15px;
+  color: var(--text-paper-muted);
+}
+.book-card .tag{
+  position:absolute; top:12px; left:12px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 5px 10px;
+  border-radius: 999px;
+  background: rgba(250,248,243,0.92);
+  color: var(--ink);
+  backdrop-filter: blur(4px);
+}
+.book-card .body{ padding: 20px; flex:1; display:flex; flex-direction:column; }
+.book-card h5{
+  font-size: 18px; font-weight: 600; margin-bottom: 6px;
+  color: var(--text-ink);
+}
+.book-card .meta-row{
+  display:flex; flex-direction:column; gap:4px;
+  font-size: 13.5px; color: var(--text-muted);
+  margin-bottom: 14px;
+}
+.book-card .meta-row span b{ color: var(--text-ink); font-weight:600; }
+.book-card .price{
+  font-family: var(--font-mono);
+  font-size: 22px;
+  font-weight: 500;
+  color: var(--gold-deep);
+  margin-top: auto;
+}
+.book-card .footer{ padding: 0 20px 20px; }
+
+/* ==========================================================================
+   Formularios
+   ========================================================================== */
+.ub-field{ margin-bottom: 20px; }
+.ub-field label{
+  display:block;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+}
+.ub-field .form-control, .ub-field .form-select, .ub-field textarea{
+  width:100%;
+  font-family: var(--font-body);
+  font-size: 15px;
+  padding: 13px 16px;
+  border-radius: var(--radius-sm);
+  border: 1.5px solid var(--paper-line);
+  background: var(--paper);
+  color: var(--text-ink);
+  transition: border-color .2s var(--ease), background .2s var(--ease), box-shadow .2s var(--ease);
+}
+.ub-field .form-control:focus, .ub-field .form-select:focus, .ub-field textarea:focus{
+  outline:none;
+  border-color: var(--gold);
+  background:#fff;
+  box-shadow: 0 0 0 4px rgba(198,161,91,0.15);
+}
+.ub-field textarea{ min-height: 110px; resize: vertical; }
+
+.ub-form-card{
+  background:#fff;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lift);
+  padding: 44px;
+}
+
+/* file input custom */
+.ub-file{
+  border: 1.5px dashed var(--paper-line);
+  border-radius: var(--radius-sm);
+  padding: 20px;
+  text-align:center;
+  cursor:pointer;
+  transition: border-color .2s var(--ease), background .2s var(--ease);
+  background: var(--paper);
+}
+.ub-file:hover{ border-color: var(--gold); background:#fff; }
+
+/* ==========================================================================
+   Hero / Landing — el "estante" interactivo
+   ========================================================================== */
+.ub-hero{
+  background: var(--ink);
+  color: var(--text-paper);
+  position: relative;
+  overflow: hidden;
+  padding: 90px 0 60px;
+}
+.ub-hero::before{
+  /* textura sutil tipo papel/grano */
+  content:"";
+  position:absolute; inset:0;
+  background-image: radial-gradient(circle at 20% 20%, rgba(198,161,91,0.08), transparent 45%),
+                     radial-gradient(circle at 85% 70%, rgba(198,161,91,0.06), transparent 50%);
+  pointer-events:none;
+}
+.ub-hero .hero-inner{
+  position:relative; z-index:1;
+  max-width: 620px;
+}
+.ub-hero h1{
+  font-size: clamp(38px, 5.5vw, 64px);
+  font-weight: 600;
+  line-height: 1.05;
+  margin: 18px 0 20px;
+}
+.ub-hero h1 em{
+  font-style: italic;
+  color: var(--gold);
+}
+.ub-hero p.lead{
+  font-size: 18px;
+  color: var(--text-paper-muted);
+  line-height: 1.6;
+  margin-bottom: 34px;
+  max-width: 480px;
+}
+.ub-hero .hero-actions{ display:flex; gap:14px; flex-wrap:wrap; }
+
+/* Estante de libros — signature element */
+.shelf{
+  position:relative; z-index:1;
+  display:flex;
+  align-items:flex-end;
+  gap: 14px;
+  height: 340px;
+  margin-top: 60px;
+  padding: 0 4px 18px;
+  perspective: 1000px;
+}
+.shelf::after{
+  content:"";
+  position:absolute;
+  left:0; right:0; bottom:0;
+  height: 10px;
+  background: linear-gradient(180deg, var(--gold-deep), transparent);
+  opacity:0.35;
+  border-radius: 3px;
+}
+.spine{
+  flex:1;
+  border-radius: 6px 6px 3px 3px;
+  display:flex;
+  align-items:flex-start;
+  justify-content:center;
+  padding-top: 22px;
+  writing-mode: vertical-rl;
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  color: rgba(250,248,243,0.88);
+  cursor: default;
+  transform-origin: bottom center;
+  transition: transform .5s var(--ease), box-shadow .5s var(--ease), height .5s var(--ease);
+  box-shadow: -2px 0 0 rgba(255,255,255,0.04) inset, var(--shadow-soft);
+}
+.spine:hover{
+  transform: translateY(-14px) rotateZ(-1.5deg);
+  box-shadow: var(--shadow-lift);
+}
+.spine:nth-child(1){ height: 82%; background: linear-gradient(160deg,#8C5B3F,#6E4530); }
+.spine:nth-child(2){ height: 94%; background: linear-gradient(160deg,#3D5A4C,#294439); }
+.spine:nth-child(3){ height: 74%; background: linear-gradient(160deg,#4A5468,#333B4C); }
+.spine:nth-child(4){ height: 100%; background: linear-gradient(160deg, var(--gold-deep), #7A5F2E); color:#1B140A; }
+.spine:nth-child(5){ height: 86%; background: linear-gradient(160deg,#6B3B4A,#4C2836); }
+.spine:nth-child(6){ height: 78%; background: linear-gradient(160deg,#33465A,#22303E); }
+
+/* ==========================================================================
+   Secciones claras (auth, catálogo, etc.)
+   ========================================================================== */
+.ub-section{ padding: 64px 0; }
+.ub-section-alt{ background: var(--paper-dim); }
+
+.auth-shell{
+  min-height: 100vh;
+  display:flex;
+}
+.auth-shell .side-art{
+  flex: 1;
+  background: var(--ink);
+  position:relative;
+  display:flex; align-items:center; justify-content:center;
+  padding: 60px;
+  overflow:hidden;
+}
+.auth-shell .side-form{
+  flex: 1;
+  display:flex; align-items:center; justify-content:center;
+  padding: 40px;
+  background: var(--paper);
+}
+.auth-shell .side-form .wrap{ width:100%; max-width: 420px; }
+@media (max-width: 900px){
+  .auth-shell{ flex-direction:column; }
+  .auth-shell .side-art{ min-height: 220px; padding: 40px; }
+}
+
+/* Badges tipo "sello de biblioteca" */
+.stamp{
+  display:inline-flex; align-items:center;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 5px 12px;
+  border-radius: 999px;
+  border: 1px solid currentColor;
+}
+.stamp-venta{ color: var(--success); background: var(--success-bg); border-color: transparent; }
+.stamp-intercambio{ color: var(--gold-deep); background: #F5EEDD; border-color: transparent; }
+
+/* Alerts */
+.ub-alert{
+  border-radius: var(--radius-sm);
+  padding: 14px 18px;
+  font-size: 14.5px;
+  border: 1px solid transparent;
+  margin-bottom: 20px;
+}
+.ub-alert-success{ background: var(--success-bg); color: var(--success); border-color: rgba(47,107,79,0.2); }
+.ub-alert-danger{ background: var(--danger-bg); color: var(--danger); border-color: rgba(179,67,43,0.2); }
+
+/* Scroll reveal */
+.reveal{ opacity:0; transform: translateY(18px); transition: opacity .7s var(--ease), transform .7s var(--ease); }
+.reveal.is-visible{ opacity:1; transform:none; }
+
+/* Perfil avatar */
+.avatar-ring{
+  width:96px; height:96px; border-radius:50%;
+  background: var(--ink);
+  color: var(--gold-bright);
+  display:flex; align-items:center; justify-content:center;
+  font-size: 34px;
+  border: 3px solid var(--gold);
+}
+
+/* Stat card */
+.stat-card{
+  background:#fff;
+  border:1px solid var(--paper-line);
+  border-radius: var(--radius);
+  padding: 28px 20px;
+  text-align:center;
+  transition: transform .3s var(--ease), box-shadow .3s var(--ease);
+}
+.stat-card:hover{ transform: translateY(-4px); box-shadow: var(--shadow-lift); }
+.stat-card .num{ font-family: var(--font-display); font-size: 34px; color: var(--gold-deep); }
+.stat-card .lbl{ font-size: 13px; color: var(--text-muted); text-transform:uppercase; letter-spacing:0.05em; }
+
+footer.ub-footer{
+  background: var(--ink);
+  color: var(--text-paper-muted);
+  padding: 28px 0;
+  text-align:center;
+  font-size: 13.5px;
+}
+
+/* ==========================================================================
+   Catálogo — Hero
+   Mismo lenguaje visual del hero de la landing/registro (fondo "ink",
+   ub-eyebrow, acentos dorados) para que la entrada al catálogo se sienta
+   como una continuación natural, no como una página distinta.
+   ========================================================================== */
+.catalog-hero{
+  background: var(--ink);
+  color: var(--text-paper);
+  position: relative;
+  overflow: hidden;
+  padding: 76px 0 64px;
+}
+.catalog-hero::before{
+  content:"";
+  position:absolute; inset:0;
+  background-image: radial-gradient(circle at 15% 25%, rgba(198,161,91,0.10), transparent 45%),
+                     radial-gradient(circle at 90% 80%, rgba(198,161,91,0.07), transparent 50%);
+  pointer-events:none;
+}
+.catalog-hero__inner{
+  position:relative; z-index:1;
+  max-width: 640px;
+}
+.catalog-hero__title{
+  font-family: var(--font-display);
+  font-size: clamp(30px, 4vw, 46px);
+  font-weight: 600;
+  line-height: 1.12;
+  margin: 16px 0 14px;
+}
+.catalog-hero__title em{
+  font-style: italic;
+  color: var(--gold);
+}
+.catalog-hero__lead{
+  font-size: 16.5px;
+  color: var(--text-paper-muted);
+  line-height: 1.6;
+  margin-bottom: 30px;
+  max-width: 480px;
+}
+
+/* Buscador flotante del catálogo (misma lógica JS, solo estilo nuevo) */
+.catalog-search{
+  position:relative;
+  max-width: 480px;
+}
+.catalog-search__icon{
+  position:absolute;
+  left: 20px; top:50%;
+  transform: translateY(-50%);
+  font-size: 15px;
+  opacity:.75;
+  pointer-events:none;
+}
+.catalog-search__input{
+  width:100%;
+  font-family: var(--font-body);
+  font-size: 15px;
+  padding: 15px 20px 15px 48px;
+  border-radius: 999px;
+  border: 1.5px solid rgba(244,241,232,0.14);
+  background: rgba(244,241,232,0.06);
+  color: var(--text-paper);
+  transition: border-color .25s var(--ease), background .25s var(--ease), box-shadow .25s var(--ease);
+}
+.catalog-search__input::placeholder{ color: var(--text-paper-muted); }
+.catalog-search__input:focus{
+  outline:none;
+  border-color: var(--gold);
+  background: rgba(244,241,232,0.1);
+  box-shadow: 0 0 0 4px rgba(198,161,91,0.18);
+}
+
+/* Barra de estado / contador de resultados */
+.catalog-toolbar{
+  display:flex; align-items:center; justify-content:space-between;
+  flex-wrap:wrap; gap:12px;
+  margin-bottom: 28px;
+}
+.catalog-count{
+  font-family: var(--font-mono);
+  font-size: 13px;
+  letter-spacing:0.02em;
+  color: var(--text-muted);
+  margin:0;
+}
+.catalog-count b{ color: var(--text-ink); }
+
+/* Colores de tag por tipo de publicación (coherentes con .stamp-*) */
+.book-card .tag-venta{ background: var(--success-bg); color: var(--success); }
+.book-card .tag-intercambio{ background:#F5EEDD; color: var(--gold-deep); }
+
+/* Estado vacío del catálogo (sin resultados de búsqueda) */
+.catalog-empty{
+  text-align:center;
+  padding: 70px 20px;
+  border: 1.5px dashed var(--paper-line);
+  border-radius: var(--radius-lg);
+  background: var(--paper-dim);
+}
+.catalog-empty__icon{ font-size: 38px; margin-bottom: 10px; }
+
+/* Entrada escalonada de las tarjetas del catálogo (misma clase .reveal,
+   solo se añade un pequeño delay progresivo para un efecto de "oleada") */
+#contenedorLibros .libro-card:nth-child(1){ transition-delay: 0s; }
+#contenedorLibros .libro-card:nth-child(2){ transition-delay: .05s; }
+#contenedorLibros .libro-card:nth-child(3){ transition-delay: .10s; }
+#contenedorLibros .libro-card:nth-child(4){ transition-delay: .15s; }
+#contenedorLibros .libro-card:nth-child(5){ transition-delay: .20s; }
+#contenedorLibros .libro-card:nth-child(6){ transition-delay: .25s; }
+#contenedorLibros .libro-card:nth-child(n+7){ transition-delay: .28s; }
+
+@media (max-width: 700px){
+  .catalog-hero{ padding: 56px 0 46px; }
+}
+
+/* ==========================================================================
+   Transiciones de navegación entre páginas (View Transitions API nativa)
+   ==========================================================================
+   Crea un cross-fade suave y coherente cada vez que se navega entre vistas
+   completas (Landing/Registro → Catálogo → Ver detalle → Perfil, etc.),
+   ya que este proyecto navega por recargas de página (index.php?accion=...)
+   y no por SPA/JS. Es progressive enhancement puro:
+   - Navegadores compatibles (Chrome/Edge recientes): ven el cross-fade.
+   - Navegadores sin soporte: ignoran la regla y todo funciona exactamente
+     igual que antes, sin ningún cambio visual ni funcional.
+   No agrega dependencias ni JS adicional.
+   ========================================================================== */
+@view-transition{
+  navigation: auto;
+}
+
+::view-transition-old(root){
+  animation: ub-view-fade-out .28s var(--ease) both;
+}
+::view-transition-new(root){
+  animation: ub-view-fade-in .38s var(--ease) both;
+}
+
+@keyframes ub-view-fade-out{
+  to{ opacity: 0; transform: translateY(-6px); }
+}
+@keyframes ub-view-fade-in{
+  from{ opacity: 0; transform: translateY(10px); }
+}
+
+@media (prefers-reduced-motion: reduce){
+  ::view-transition-old(root),
+  ::view-transition-new(root){ animation: none !important; }
+}
+
+/* ==========================================================================
+   Detalle del libro (Fase 2)
+   Mismo lenguaje visual (papel/tinta/latón, Fraunces/Manrope, acentos
+   dorados) que el resto de UniBook. Reutiliza .price, .stamp, .ub-eyebrow,
+   .btn-ub, .no-image y el sistema .reveal ya existentes.
+   ========================================================================== */
+
+/* Volver al catálogo */
+.book-detail__back{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  letter-spacing: 0.03em;
+  color: var(--text-muted);
+  margin-bottom: 26px;
+  transition: color .2s var(--ease), transform .2s var(--ease);
+}
+.book-detail__back:hover{ color: var(--gold-deep); transform: translateX(-3px); }
+
+/* Layout principal: portada + información */
+.book-detail{
+  display:grid;
+  grid-template-columns: minmax(0, 380px) 1fr;
+  gap: 44px;
+  align-items:start;
+}
+
+/* Portada */
+.book-detail__cover{
+  position: sticky;
+  top: 24px;
+  border-radius: var(--radius-lg);
+  overflow:hidden;
+  box-shadow: var(--shadow-lift);
+  background: linear-gradient(135deg, var(--ink-soft), var(--ink));
+  aspect-ratio: 3 / 4;
+}
+.book-detail__cover img{
+  width:100%; height:100%; object-fit:cover; display:block;
+}
+.book-detail__cover .no-image{
+  width:100%; height:100%;
+  display:flex; align-items:center; justify-content:center;
+  font-family: var(--font-display);
+  font-size: 15px;
+  color: var(--text-paper-muted);
+}
+/* Aparición más suave (escala) que el reveal genérico (translateY) */
+.book-detail__cover.reveal{ transform: scale(0.96); }
+
+.book-detail__tag{
+  position:absolute; top:16px; left:16px;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: rgba(250,248,243,0.92);
+  color: var(--ink);
+  backdrop-filter: blur(4px);
+}
+.book-detail__cover .tag-venta{ background: var(--success-bg); color: var(--success); }
+.book-detail__cover .tag-intercambio{ background:#F5EEDD; color: var(--gold-deep); }
+
+/* Información */
+.book-detail__info{ min-width:0; }
+
+.book-detail__header{
+  padding-bottom: 24px;
+  border-bottom: 1px solid var(--paper-line);
+  margin-bottom: 24px;
+}
+.book-detail__title{
+  font-size: clamp(26px, 3.4vw, 36px);
+  font-weight: 600;
+  line-height: 1.15;
+  margin: 4px 0 8px;
+}
+.book-detail__author{
+  color: var(--text-muted);
+  font-size: 15.5px;
+  margin-bottom: 18px;
+}
+.book-detail__price-row{
+  display:flex; align-items:center; gap:16px; flex-wrap:wrap;
+}
+.book-detail__price.price{ font-size: 32px; }
+
+.stamp-neutral{ color: var(--text-muted); background: var(--paper-dim); border-color: transparent; }
+.stamp-own{ color: var(--gold-deep); background: #F5EEDD; border-color: transparent; }
+
+/* Ficha técnica (universidad, carrera, semestre, materia) */
+.book-detail__meta{
+  display:grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px 28px;
+  margin-bottom: 28px;
+}
+.book-detail__meta .meta-item p{
+  margin: 6px 0 0;
+  font-size: 15px;
+  color: var(--text-ink);
+  font-weight: 500;
+}
+
+/* Descripción */
+.book-detail__description{ margin-bottom: 32px; }
+.book-detail__description p{
+  margin-top:8px;
+  color: var(--text-muted);
+  line-height: 1.7;
+  font-size: 15px;
+  white-space: normal;
+}
+
+/* Tarjeta de vendedor */
+.seller-card{
+  display:flex;
+  align-items:center;
+  gap:18px;
+  flex-wrap:wrap;
+  background: var(--paper-dim);
+  border: 1px solid var(--paper-line);
+  border-radius: var(--radius);
+  padding: 20px 22px;
+  transition: box-shadow .3s var(--ease), border-color .3s var(--ease);
+}
+.seller-card:hover{ box-shadow: var(--shadow-soft); border-color: var(--gold); }
+.seller-card__avatar{
+  width:52px; height:52px; border-radius:50%;
+  background: var(--ink);
+  color: var(--gold-bright);
+  display:flex; align-items:center; justify-content:center;
+  font-size: 22px;
+  flex-shrink:0;
+}
+.seller-card__info{ flex:1; min-width:160px; }
+.seller-card__info h5{ margin: 2px 0 2px; font-size: 17px; font-weight: 600; }
+.seller-card__cta{ flex-shrink:0; }
+
+/* Delays de entrada escalonada, reutilizables en toda la app junto con .reveal */
+.reveal-d1{ transition-delay: .08s; }
+.reveal-d2{ transition-delay: .16s; }
+.reveal-d3{ transition-delay: .24s; }
+.reveal-d4{ transition-delay: .32s; }
+
+/* Responsive: tablet y celular */
+@media (max-width: 900px){
+  .book-detail{
+    grid-template-columns: 1fr;
+    gap: 28px;
+  }
+  .book-detail__cover{
+    position: static;
+    max-width: 340px;
+    margin: 0 auto;
+  }
+}
+@media (max-width: 560px){
+  .book-detail__meta{ grid-template-columns: 1fr; }
+  .book-detail__price-row{ flex-direction:column; align-items:flex-start; gap:10px; }
+  .seller-card{ flex-direction:column; align-items:flex-start; text-align:left; }
+  .seller-card__cta{ width:100%; text-align:center; }
+}
+
+/* ==========================================================================
+   Disponibilidad de libros (Fase 3.1)
+   Reutiliza el sistema ".stamp" ya existente, solo se agregan los
+   colores que faltaban para representar cada estado.
+   ========================================================================== */
+.badge-disp-disponible{ color: var(--success); background: var(--success-bg); border-color: transparent; }
+.badge-disp-reservado{ color: var(--gold-deep); background: #F5EEDD; border-color: transparent; }
+.badge-disp-vendido{ color: var(--text-muted); background: var(--paper-dim); border-color: transparent; }
+.badge-disp-intercambiado{ color: #3B5A7A; background: #E6EDF5; border-color: transparent; }
+
+/* Portada semi-opacada en el catálogo cuando el libro ya no está disponible */
+.cover--unavailable img,
+.cover--unavailable .no-image{
+  opacity: 0.35;
+  filter: grayscale(0.3);
+}
+.cover__overlay{
+  position:absolute; inset:0;
+  display:flex; align-items:center; justify-content:center;
+  background: rgba(26,22,17,0.12);
+  z-index:2;
+}
+
+/* ==========================================================================
+   Compra simulada de libros (Fase 3.2 — alcance reducido)
+   Reutiliza .ub-card, .stamp, .btn-ub, .seller-card ya existentes.
+   ========================================================================== */
+
+/* Botón de acción en el detalle del libro */
+.book-detail__actions{ margin-top: 20px; }
+
+/* Resumen del libro en checkout / confirmación */
+.checkout-summary{
+  display:flex; gap:20px; align-items:center; flex-wrap:wrap;
+  background: var(--paper-dim);
+  border: 1px solid var(--paper-line);
+  border-radius: var(--radius);
+  padding: 20px;
+}
+.checkout-summary__thumb{
+  width:84px; height:112px; border-radius: var(--radius-sm);
+  overflow:hidden; flex-shrink:0;
+  background: linear-gradient(135deg, var(--ink-soft), var(--ink));
+  display:flex; align-items:center; justify-content:center;
+  color: var(--text-paper-muted); font-size:22px;
+}
+.checkout-summary__thumb img{ width:100%; height:100%; object-fit:cover; }
+.checkout-summary__info h4{ margin:0 0 6px; font-size:19px; font-weight:600; }
+.checkout-summary__info p{ margin:0 0 3px; color: var(--text-muted); font-size:14px; }
+.checkout-summary__price{
+  font-family: var(--font-mono);
+  font-weight:600;
+  font-size: 24px;
+  color: var(--gold-deep);
+  flex-shrink:0;
+}
+
+/* Selector visual de método de pago (100% simulado) */
+.payment-methods{
+  display:grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px;
+}
+.payment-method{ cursor:pointer; }
+.payment-method input{
+  position:absolute;
+  opacity:0;
+  width:0; height:0;
+}
+.payment-method__card{
+  display:flex; align-items:center; gap:10px;
+  padding: 14px 16px;
+  border: 1.5px solid var(--paper-line);
+  border-radius: var(--radius-sm);
+  font-weight:500;
+  transition: border-color .2s var(--ease), background .2s var(--ease), transform .15s var(--ease);
+}
+.payment-method__icon{ font-size:20px; }
+.payment-method input:checked + .payment-method__card{
+  border-color: var(--gold);
+  background: #FBF6EA;
+}
+.payment-method:hover .payment-method__card{ transform: translateY(-2px); }
+.payment-method input:focus-visible + .payment-method__card{
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+/* Ícono circular de la pantalla de confirmación */
+.confirm-icon{
+  width:64px; height:64px; border-radius:50%;
+  background: var(--success-bg); color: var(--success);
+  display:flex; align-items:center; justify-content:center;
+  font-size:30px; margin: 0 auto 18px;
+}
+
+/* Badge de estado "Pendiente" en la pantalla de éxito.
+   Los badges de vendida/rechazada/cancelada se agregan junto con
+   Mis compras / Mis ventas en la siguiente fase. */
+.badge-compra-pendiente{ color: var(--gold-deep); background: #F5EEDD; border-color: transparent; }
+
+@media (max-width:560px){
+  .checkout-summary{ flex-direction:column; text-align:center; }
+}

@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 60" role="img" aria-label="UniBook">
+  <defs>
+    <linearGradient id="n1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4a7dc0"/><stop offset="1" stop-color="#16407a"/></linearGradient>
+    <linearGradient id="n2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3a69ab"/><stop offset="1" stop-color="#0f3469"/></linearGradient>
+    <linearGradient id="g1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#e2c488"/><stop offset="1" stop-color="#b98f4f"/></linearGradient>
+  </defs>
+  <path d="M3 17c0-2 1.4-3.4 3.4-3.4H9v34.6c-2.6 0-4.4-.2-5.6-1.3C2.4 46 3 44 3 42Z" fill="url(#g1)"/>
+  <path d="M61 21c0-2-1.4-3.4-3.4-3.4H55v30.6c2.6 0 4.4-.2 5.6-1.3 1-.9.4-2.9.4-4.9Z" fill="#0f3469"/>
+  <path d="M10 6.5C18.600 5.300 26.200 7.200 31 11.500V54c-5-3.600-12.400-5.200-21-4.200Z" fill="url(#n1)"/>
+  <path d="M54 6.500C45.400 5.300 37.800 7.200 33 11.500V54c5-3.600 12.400-5.200 21-4.200Z" fill="url(#n2)"/>
+  <path d="M31 11.500V54h2V11.500Z" fill="#fff" opacity=".85"/>
+  <path d="M12 10.800c5.600-.6 10.200.6 14.500 3.200" stroke="#fff" stroke-opacity=".28" stroke-width="1.400" fill="none" stroke-linecap="round"/>
+</svg>

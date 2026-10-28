@@ -1,0 +1,655 @@
+/* ==========================================================================
+   UNIBOOK — MIS VENTAS (tablero analítico, glassmorphism)
+   --------------------------------------------------------------------------
+   Hoja AISLADA: solo se enlaza desde views/mis_ventas.php y todas sus clases
+   empiezan por .uv, así que no puede afectar a otras pantallas. Reutiliza los
+   tokens de ub-glass.css (colores, radios, sombras y tema oscuro).
+
+   Vidrio: los paneles usan backdrop-filter sobre luces de color (.uv-aurora)
+   para que el efecto sea visible. Ningún elemento con backdrop-filter va
+   dentro de otro (los anidados no desenfocan en los navegadores).
+
+   Índice
+     0. Tokens          6. Gráfica de ingresos       12. Tabla
+     1. Contenedor      7. Dona de estados           13. Botones y estados
+     2. Cabecera        8. Métodos de pago           14. Estado vacío
+     3. Indicadores     9. Mayores ventas            15. Animación
+     4. Paneles        10. (reservado)               16. Contenedor adaptable
+     5. Rejillas       11. Utilidades                17. Movimiento reducido
+   ========================================================================== */
+
+
+/* ==========================================================================
+   0. TOKENS
+   ========================================================================== */
+
+.uv{
+  --uv-card:      rgba(255,255,255,.50);
+  --uv-card-edge: rgba(255,255,255,.82);
+  --uv-line:      rgba(14,58,107,.11);
+  --uv-grid:      rgba(14,58,107,.13);
+  --uv-money:     #1d7452;
+  --uv-ring:      rgba(44,111,209,.60);
+  --uv-blur:      blur(24px) saturate(190%);
+
+  --uv-bar-top:    #4a90ec;
+  --uv-bar-bottom: #0e3a6b;
+
+  --uv-c-ok: #2c9a72;   --uv-c-wa: #d9a23f;   --uv-c-no: #e2566c;   --uv-c-ne: #8193b4;
+
+  --uv-ok-bg:  rgba(44,138,102,.15);  --uv-ok-fg:  #0f6040;
+  --uv-wa-bg:  rgba(191,127,47,.19);  --uv-wa-fg:  #7a4d0b;
+  --uv-no-bg:  rgba(238,74,94,.14);   --uv-no-fg:  #a8202f;
+  --uv-ne-bg:  rgba(77,98,134,.14);   --uv-ne-fg:  #324a70;
+
+  position:relative; isolation:isolate;
+  container-type:inline-size; container-name:uv;
+  max-width:1120px; margin:0 auto; padding-bottom:12px;
+  font-family: var(--ub-font);
+}
+
+html[data-theme="dark"] .uv{
+  --uv-card:      rgba(24,44,86,.52);
+  --uv-card-edge: rgba(255,255,255,.15);
+  --uv-line:      rgba(255,255,255,.12);
+  --uv-grid:      rgba(255,255,255,.10);
+  --uv-money:     #6fd3a8;
+  --uv-ring:      rgba(140,185,255,.80);
+  --uv-bar-top:    #8cbcff;
+  --uv-bar-bottom: #2f6fb5;
+
+  --uv-c-ok: #5fcfa1;  --uv-c-wa: #f0bb68;  --uv-c-no: #ff8497;  --uv-c-ne: #9db0d0;
+
+  --uv-ok-bg:  rgba(111,211,168,.17); --uv-ok-fg:  #8be0bb;
+  --uv-wa-bg:  rgba(240,180,98,.18);  --uv-wa-fg:  #f4c680;
+  --uv-no-bg:  rgba(255,120,138,.17); --uv-no-fg:  #ff9aa8;
+  --uv-ne-bg:  rgba(255,255,255,.11); --uv-ne-fg:  #c3d3ee;
+}
+
+
+/* ==========================================================================
+   1. CONTENEDOR Y LUCES DE FONDO
+   ========================================================================== */
+
+.uv-aurora{
+  position:absolute; inset:0; z-index:-1; overflow:hidden; pointer-events:none;
+}
+.uv-aurora span{ position:absolute; border-radius:50%; }
+.uv-aurora__a{ width:560px; height:560px; left:-140px; top:-80px;
+  background: radial-gradient(circle, rgba(56,118,226,.40), transparent 68%); }
+.uv-aurora__b{ width:480px; height:480px; right:-120px; top:90px;
+  background: radial-gradient(circle, rgba(226,172,96,.40), transparent 68%); }
+.uv-aurora__c{ width:620px; height:620px; left:18%; top:520px;
+  background: radial-gradient(circle, rgba(104,134,230,.34), transparent 68%); }
+.uv-aurora__d{ width:520px; height:520px; right:-100px; top:1080px;
+  background: radial-gradient(circle, rgba(64,150,226,.30), transparent 68%); }
+
+html[data-theme="dark"] .uv-aurora__a{ background: radial-gradient(circle, rgba(64,124,226,.40), transparent 68%); }
+html[data-theme="dark"] .uv-aurora__b{ background: radial-gradient(circle, rgba(185,148,91,.30), transparent 68%); }
+html[data-theme="dark"] .uv-aurora__c{ background: radial-gradient(circle, rgba(90,110,220,.34), transparent 68%); }
+html[data-theme="dark"] .uv-aurora__d{ background: radial-gradient(circle, rgba(50,130,210,.28), transparent 68%); }
+
+.uv [hidden]{ display:none !important; }
+
+
+/* ==========================================================================
+   2. CABECERA
+   ========================================================================== */
+
+.uv-hero{
+  display:grid; grid-template-columns: minmax(0,1fr) auto; gap:26px 30px; align-items:end;
+  padding:6px 4px 26px;
+}
+
+.uv-chip{
+  display:inline-flex; align-items:center; gap:7px;
+  padding:7px 14px; border-radius:999px;
+  background: rgba(255,255,255,.60);
+  border:1px solid var(--uv-card-edge);
+  box-shadow: 0 4px 14px rgba(46,84,140,.10), inset 0 1px 0 rgba(255,255,255,.9);
+  -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
+  font:600 12px/1 var(--ub-font); color: var(--ub-navy);
+}
+.uv-chip i{ color: var(--ub-blue); font-size:14px; }
+html[data-theme="dark"] .uv-chip{ background: rgba(255,255,255,.09); }
+
+.uv .uv-title{
+  margin:16px 0 10px;
+  font-family: var(--ub-font-brand); font-weight:700;
+  font-size: clamp(38px, 5.4vw, 60px); line-height:1.02; letter-spacing:-.028em;
+  color: var(--ub-navy);
+}
+.uv .uv-lead{
+  max-width:50ch; margin:0; font-size:15.5px; line-height:1.6; font-weight:500; color: var(--ub-slate);
+}
+
+.uv-hero__tools{ display:flex; flex-direction:column; align-items:flex-end; gap:12px; }
+
+/* Selector de periodo */
+.uv-periods{
+  display:inline-flex; gap:4px; padding:5px; border-radius:999px;
+  background: var(--uv-card);
+  border:1px solid var(--uv-card-edge);
+  box-shadow: 0 10px 26px rgba(46,84,140,.14), inset 0 1px 0 rgba(255,255,255,.9);
+  -webkit-backdrop-filter: var(--uv-blur); backdrop-filter: var(--uv-blur);
+}
+body.ub-glass .uv a.uv-periods__item{
+  display:inline-flex; align-items:center; justify-content:center;
+  min-height:38px; padding:0 17px; border-radius:999px;
+  font:700 13px/1 var(--ub-font); color: var(--ub-slate); text-decoration:none;
+  transition: background-color .2s ease, color .2s ease, box-shadow .2s ease, transform .15s ease;
+}
+@media (hover:hover){
+  body.ub-glass .uv a.uv-periods__item:hover{ background: rgba(255,255,255,.7); color: var(--ub-navy); }
+}
+body.ub-glass .uv a.uv-periods__item:active{ transform: scale(.96); }
+body.ub-glass .uv a.uv-periods__item:focus-visible{ outline:3px solid var(--uv-ring); outline-offset:2px; }
+body.ub-glass .uv a.uv-periods__item.is-active{
+  background: linear-gradient(180deg, #1c5a96, #0a2f56); color:#fff;
+  box-shadow: 0 6px 14px rgba(11,52,93,.30), inset 0 1px 0 rgba(255,255,255,.22);
+}
+html[data-theme="dark"] body.ub-glass .uv a.uv-periods__item:hover{ background: rgba(255,255,255,.10); }
+html[data-theme="dark"] body.ub-glass .uv a.uv-periods__item.is-active{ background: linear-gradient(180deg, #2f6fb5, #17457c); }
+
+.uv-range, .uv-updated{
+  margin:0; display:flex; align-items:center; flex-wrap:wrap; justify-content:flex-end; gap:7px;
+  font-size:13px; font-weight:500; color: var(--ub-slate);
+}
+.uv-range strong{ color: var(--ub-navy); font-weight:800; }
+.uv-range i, .uv-updated > i{ color: var(--ub-blue); font-size:14px; }
+.uv-range__sep{ width:4px; height:4px; border-radius:50%; background: currentColor; opacity:.45; }
+.uv-updated{ font-size:12.5px; }
+
+body.ub-glass .uv a.uv-refresh{
+  display:inline-grid; place-items:center; width:28px; height:28px; border-radius:50%;
+  background: rgba(255,255,255,.6); border:1px solid var(--uv-card-edge);
+  color: var(--ub-navy); text-decoration:none; font-size:14px;
+  transition: transform .3s ease, background-color .2s ease;
+}
+@media (hover:hover){ body.ub-glass .uv a.uv-refresh:hover{ transform: rotate(180deg); background:#fff; } }
+body.ub-glass .uv a.uv-refresh:focus-visible{ outline:3px solid var(--uv-ring); outline-offset:2px; }
+html[data-theme="dark"] body.ub-glass .uv a.uv-refresh{ background: rgba(255,255,255,.10); }
+
+
+/* ==========================================================================
+   3. INDICADORES
+   ========================================================================== */
+
+.uv-kpis{
+  display:grid; gap:14px; margin-bottom:18px;
+  grid-template-columns: repeat(6, minmax(0,1fr));
+}
+.uv-kpi{
+  grid-column: span 1;
+  display:flex; flex-direction:column; gap:10px; min-width:0;
+  padding:18px 18px 16px; border-radius:26px;
+  background: var(--uv-card); background-image: var(--ub-sheen);
+  border:1px solid var(--uv-card-edge);
+  box-shadow: 0 16px 36px rgba(46,84,140,.14), inset 0 1px 0 rgba(255,255,255,.95);
+  -webkit-backdrop-filter: var(--uv-blur); backdrop-filter: var(--uv-blur);
+  transition: transform .28s cubic-bezier(.22,.8,.3,1), box-shadow .28s ease;
+}
+html[data-theme="dark"] .uv-kpi{ box-shadow: 0 16px 36px rgba(0,0,0,.30), inset 0 1px 0 rgba(255,255,255,.09); }
+@media (hover:hover){
+  .uv-kpi:hover{ transform: translateY(-3px); box-shadow: 0 22px 46px rgba(46,84,140,.20), inset 0 1px 0 #fff; }
+}
+
+.uv-kpi__head{ display:flex; align-items:center; gap:11px; min-width:0; }
+.uv-kpi__icon{
+  flex:none; display:grid; place-items:center; width:38px; height:38px; border-radius:13px;
+  background: linear-gradient(160deg, rgba(207,226,251,.95), rgba(255,255,255,.6));
+  border:1px solid rgba(255,255,255,.9); color: var(--ub-blue); font-size:17px;
+}
+.uv-kpi__icon--amber{ background: linear-gradient(160deg, rgba(246,222,176,.95), rgba(255,255,255,.6)); color:#a8741a; }
+html[data-theme="dark"] .uv-kpi__icon{ background: rgba(140,185,255,.16); border-color: rgba(255,255,255,.12); color:#9cc4ff; }
+html[data-theme="dark"] .uv-kpi__icon--amber{ background: rgba(240,180,98,.17); color:#f4c680; }
+
+.uv-kpi__label{ margin:0; font:700 12px/1.3 var(--ub-font); color: var(--ub-slate); }
+.uv-kpi__value{
+  margin:0; font:800 26px/1.05 var(--ub-font); letter-spacing:-.03em;
+  color: var(--ub-navy); font-variant-numeric: tabular-nums; white-space:nowrap;
+}
+.uv-kpi__foot{ margin:auto 0 0; display:flex; align-items:center; flex-wrap:wrap; gap:4px 8px; min-height:24px; }
+
+/* Tarjeta destacada: ingresos */
+.uv-kpi--featured{
+  grid-column: span 2;
+  background:
+    radial-gradient(70% 90% at 100% 0%, rgba(120,180,255,.38), transparent 70%),
+    linear-gradient(160deg, rgba(24,86,152,.88), rgba(9,40,76,.90));
+  border-color: rgba(255,255,255,.30);
+  box-shadow: 0 22px 46px rgba(11,52,93,.34), inset 0 1px 0 rgba(255,255,255,.30);
+}
+.uv-kpi--featured .uv-kpi__icon{ background: rgba(255,255,255,.18); border-color: rgba(255,255,255,.28); color:#fff; }
+.uv-kpi--featured .uv-kpi__label{ color: rgba(255,255,255,.82); }
+.uv-kpi--featured .uv-kpi__value{ color:#fff; font-size:38px; }
+.uv-kpi--featured .uv-delta__ref{ color: rgba(255,255,255,.72); }
+
+/* Variación frente al periodo anterior */
+.uv-delta{
+  display:inline-flex; align-items:center; gap:4px;
+  padding:4px 9px 4px 7px; border-radius:999px;
+  font:700 11.5px/1 var(--ub-font); font-variant-numeric: tabular-nums;
+}
+.uv-delta{ white-space:nowrap; }
+.uv-delta i{ font-size:12px; }
+.uv-delta--up  { background: var(--uv-ok-bg); color: var(--uv-ok-fg); }
+.uv-delta--down{ background: var(--uv-no-bg); color: var(--uv-no-fg); }
+.uv-delta--flat, .uv-delta--none{ background: var(--uv-ne-bg); color: var(--uv-ne-fg); }
+.uv-delta__ref{ font:500 11.5px/1.2 var(--ub-font); color: var(--ub-slate); }
+.uv-kpi--featured .uv-delta--up   { background: rgba(120,230,180,.22); color:#b9f5d8; }
+.uv-kpi--featured .uv-delta--down { background: rgba(255,140,156,.24); color:#ffd0d7; }
+.uv-kpi--featured .uv-delta--flat,
+.uv-kpi--featured .uv-delta--none { background: rgba(255,255,255,.16); color: rgba(255,255,255,.88); }
+
+
+/* ==========================================================================
+   4. PANELES
+   ========================================================================== */
+
+.uv-panel{
+  min-width:0; padding:22px 24px 24px; border-radius:30px;
+  background: var(--uv-card); background-image: var(--ub-sheen);
+  border:1px solid var(--uv-card-edge);
+  box-shadow: 0 20px 48px rgba(46,84,140,.15), inset 0 1px 0 rgba(255,255,255,.95);
+  -webkit-backdrop-filter: var(--uv-blur); backdrop-filter: var(--uv-blur);
+}
+html[data-theme="dark"] .uv-panel{ box-shadow: 0 20px 48px rgba(0,0,0,.32), inset 0 1px 0 rgba(255,255,255,.09); }
+
+.uv-panel__head{
+  display:flex; align-items:flex-start; justify-content:space-between; gap:14px; margin-bottom:16px;
+}
+.uv .uv-panel__head h2{
+  margin:0; font:700 18px/1.2 var(--ub-font); letter-spacing:-.012em; color: var(--ub-navy);
+}
+.uv-panel__head p{ margin:4px 0 0; font-size:13px; line-height:1.4; color: var(--ub-slate); }
+.uv-panel__figure{
+  flex:none; font:800 20px/1.1 var(--ub-font); letter-spacing:-.02em; color: var(--ub-navy);
+  font-variant-numeric: tabular-nums;
+}
+
+
+/* ==========================================================================
+   5. REJILLAS
+   ========================================================================== */
+
+.uv-grid{ display:grid; gap:18px; margin-bottom:18px; }
+.uv-grid--main{ grid-template-columns: minmax(0,1.75fr) minmax(0,1fr); }
+.uv-grid--pair{ grid-template-columns: repeat(2, minmax(0,1fr)); }
+
+
+/* ==========================================================================
+   6. GRÁFICA DE INGRESOS
+   ========================================================================== */
+
+.uv-chart{ position:relative; width:100%; min-height:250px; }
+.uv-svg{ display:block; overflow:visible; max-width:100%; }
+
+.uv-grid-line{ stroke: var(--uv-grid); stroke-dasharray:3 5; stroke-width:1; }
+.uv-axis{ stroke: var(--uv-line); stroke-width:1.2; }
+.uv-tick{ fill: var(--ub-slate); font:600 11px var(--ub-font); }
+.uv-tick--x{ font-size:11px; }
+
+.uv-hit{ fill:transparent; cursor:default; transition: fill .15s ease; }
+.uv-hit:hover{ fill: rgba(44,111,209,.08); }
+.uv-bar{ transition: filter .2s ease; }
+.uv-bar.is-hot{ filter: brightness(1.14) drop-shadow(0 8px 12px rgba(11,52,93,.28)); }
+.uv-bar:focus{ outline:none; }
+.uv-bar:focus-visible{ stroke: var(--uv-ring); stroke-width:3; }
+.uv-bar-zero{ fill: var(--uv-grid); }
+.uv-bar.is-grow{
+  transform-box: fill-box; transform-origin: 50% 100%;
+  animation: uvGrow .8s cubic-bezier(.22,.8,.3,1) both;
+  animation-delay: calc(var(--k, 0) * 22ms);
+}
+@keyframes uvGrow{ from{ transform: scaleY(0); } to{ transform: scaleY(1); } }
+
+.uv-tip{
+  position:absolute; z-index:5; left:0; top:0; pointer-events:none;
+  display:flex; flex-direction:column; gap:3px; min-width:150px; max-width:240px;
+  padding:11px 14px; border-radius:16px;
+  background: rgba(9,36,70,.95); color:#fff;
+  box-shadow: 0 16px 34px rgba(5,25,52,.38), inset 0 1px 0 rgba(255,255,255,.14);
+  font:500 12px/1.3 var(--ub-font);
+}
+.uv-tip strong{ font-weight:700; color: rgba(255,255,255,.80); font-size:11.5px; }
+.uv-tip__amount{ font:800 19px/1.1 var(--ub-font); letter-spacing:-.02em; font-variant-numeric: tabular-nums; }
+.uv-tip__ops{ color: rgba(255,255,255,.72); }
+
+.uv-chart-empty{
+  display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px;
+  min-height:220px; padding:20px; text-align:center; border-radius:22px;
+  border:1px dashed var(--uv-line); color: var(--ub-slate);
+}
+.uv-chart-empty i{ font-size:34px; color: var(--ub-blue); opacity:.7; }
+.uv-chart-empty p{ margin:4px 0 0; font:700 14.5px/1.3 var(--ub-font); color: var(--ub-navy); }
+.uv-chart-empty span{ font-size:13px; }
+body.ub-glass .uv .uv-chart-empty a{ font:700 13px/1 var(--ub-font); color: var(--ub-blue); text-decoration:underline; text-underline-offset:3px; }
+
+.uv-note{ margin:10px 0 0; font-size:12.5px; color: var(--ub-slate); }
+
+
+/* ==========================================================================
+   7. DONA DE ESTADOS
+   ========================================================================== */
+
+.uv-donut{ position:relative; width:176px; height:176px; margin:2px auto 20px; }
+.uv-donut svg{ width:100%; height:100%; display:block; overflow:visible; }
+.uv-donut__track{ fill:none; stroke: var(--uv-line); stroke-width:16; }
+.uv-donut__seg{
+  fill:none; stroke-width:16; stroke-linecap:butt;
+  animation: uvSeg .95s cubic-bezier(.22,.8,.3,1) both; animation-delay: var(--d, 0ms);
+}
+@keyframes uvSeg{ from{ stroke-dasharray: 0 400; } }
+.uv-donut__center{
+  position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center;
+}
+.uv-donut__center strong{ font:800 32px/1 var(--ub-font); letter-spacing:-.03em; color: var(--ub-navy); }
+.uv-donut__center span{ margin-top:4px; font:600 12px/1 var(--ub-font); color: var(--ub-slate); }
+
+.uv-seg--confirmada{ stroke: var(--uv-c-ok); background: var(--uv-c-ok); }
+.uv-seg--pendiente { stroke: var(--uv-c-wa); background: var(--uv-c-wa); }
+.uv-seg--cancelada { stroke: var(--uv-c-no); background: var(--uv-c-no); }
+.uv-seg--rechazada { stroke: var(--uv-c-ne); background: var(--uv-c-ne); }
+
+.uv-legend{ list-style:none; margin:0; padding:0; display:grid; gap:2px; }
+.uv-legend li{
+  display:grid; grid-template-columns: auto 1fr auto auto; align-items:center; gap:10px;
+  padding:9px 2px; border-top:1px solid var(--uv-line);
+}
+.uv-legend li:first-child{ border-top:0; }
+.uv-dot{ width:10px; height:10px; border-radius:50%; }
+.uv-legend__name{ font:600 13.5px/1.2 var(--ub-font); color: var(--ub-navy); }
+.uv-legend__n{ font:800 14px/1 var(--ub-font); color: var(--ub-navy); font-variant-numeric: tabular-nums; }
+.uv-legend__pct{ min-width:52px; text-align:right; font:600 12.5px/1 var(--ub-font); color: var(--ub-slate); font-variant-numeric: tabular-nums; }
+
+
+/* ==========================================================================
+   8. MÉTODOS DE PAGO
+   ========================================================================== */
+
+.uv-methods{ list-style:none; margin:0; padding:0; display:grid; gap:18px; }
+.uv-methods__row{ display:flex; align-items:baseline; gap:10px; margin-bottom:8px; }
+.uv-methods__name{ flex:1; font:700 14px/1.2 var(--ub-font); color: var(--ub-navy); }
+.uv-methods__amount{ font:800 14px/1 var(--ub-font); color: var(--ub-navy); font-variant-numeric: tabular-nums; }
+.uv-methods__pct{ min-width:50px; text-align:right; font:600 12.5px/1 var(--ub-font); color: var(--ub-slate); font-variant-numeric: tabular-nums; }
+.uv-methods__sub{ display:block; margin-top:6px; font-size:12px; color: var(--ub-slate); }
+
+.uv-hbar{ display:block; width:100%; }
+.uv-hbar__track{ fill: var(--uv-line); }
+.uv-hbar__fill{ fill: var(--uv-bar-top); animation: uvFill .9s cubic-bezier(.22,.8,.3,1) both; }
+@keyframes uvFill{ from{ width:0; } }
+
+
+/* ==========================================================================
+   9. MAYORES VENTAS
+   ========================================================================== */
+
+.uv-top{ list-style:none; margin:0; padding:0; display:grid; }
+.uv-top li{
+  display:grid; grid-template-columns: auto minmax(0,1fr) auto; align-items:center; gap:14px;
+  padding:13px 0; border-top:1px solid var(--uv-line);
+}
+.uv-top li:first-child{ border-top:0; padding-top:2px; }
+.uv-top__rank{
+  display:grid; place-items:center; width:30px; height:30px; border-radius:11px;
+  background: linear-gradient(160deg, rgba(207,226,251,.95), rgba(255,255,255,.6));
+  border:1px solid rgba(255,255,255,.9); font:800 13px/1 var(--ub-font); color: var(--ub-blue);
+}
+html[data-theme="dark"] .uv-top__rank{ background: rgba(140,185,255,.16); border-color: rgba(255,255,255,.12); color:#9cc4ff; }
+.uv-top__info{ display:flex; flex-direction:column; gap:3px; min-width:0; }
+.uv-top__info strong{
+  font:700 14px/1.25 var(--ub-font); color: var(--ub-navy);
+  overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+}
+.uv-top__info span{ font-size:12.5px; color: var(--ub-slate); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.uv-top__amount{ font:800 16px/1 var(--ub-font); color: var(--uv-money); font-variant-numeric: tabular-nums; white-space:nowrap; }
+
+
+/* ==========================================================================
+   11. UTILIDADES
+   ========================================================================== */
+
+.uv-sr{
+  position:absolute; width:1px; height:1px; margin:-1px; padding:0; overflow:hidden;
+  clip:rect(0,0,0,0); white-space:nowrap; border:0;
+}
+.uv-muted{ color: var(--ub-muted); }
+.uv-foot{ margin:6px 8px 0; text-align:center; font-size:12.5px; line-height:1.5; color: var(--ub-slate); }
+
+
+/* ==========================================================================
+   12. TABLA DE OPERACIONES
+   ========================================================================== */
+
+.uv-tablewrap{ margin:0 -8px; }
+.uv-table{ width:100%; border-collapse:separate; border-spacing:0; }
+
+.uv-table thead th{
+  padding:0 12px 11px; text-align:left;
+  font:700 11.5px/1 var(--ub-font); letter-spacing:.02em; color: var(--ub-slate);
+  border-bottom:1px solid var(--uv-line);
+}
+.uv-table th.is-num, .uv-table td.is-num{ text-align:right; }
+
+.uv-table tbody td{
+  padding:13px 12px; vertical-align:middle;
+  font:600 13.5px/1.35 var(--ub-font); color: var(--ub-navy);
+  border-bottom:1px solid var(--uv-line);
+  transition: background-color .2s ease;
+}
+.uv-table tbody tr:last-child td{ border-bottom:0; }
+@media (hover:hover){ .uv-table tbody tr:hover td{ background: rgba(255,255,255,.42); } }
+html[data-theme="dark"] .uv-table tbody tr:hover td{ background: rgba(255,255,255,.05); }
+.uv-table tbody tr td:first-child{ border-radius:16px 0 0 16px; }
+.uv-table tbody tr td:last-child{ border-radius:0 16px 16px 0; }
+
+.uv-cell-book{ display:flex; align-items:center; gap:13px; min-width:230px; }
+.uv-cover{
+  position:relative; flex:none; overflow:hidden; width:44px; aspect-ratio:3 / 4; border-radius:10px;
+  background: linear-gradient(160deg, rgba(207,226,251,.9), rgba(244,232,210,.8));
+  border:1px solid rgba(255,255,255,.9);
+  box-shadow: 0 8px 16px rgba(11,52,93,.20), 0 1px 3px rgba(11,52,93,.10);
+}
+html[data-theme="dark"] .uv-cover{ background: linear-gradient(160deg, rgba(60,104,176,.35), rgba(185,148,91,.22)); border-color: rgba(255,255,255,.14); }
+.uv-cover img{ display:block; width:100%; height:100%; object-fit:cover; }
+.uv-cover__none{ position:absolute; inset:0; display:grid; place-items:center; color: var(--ub-blue); font-size:19px; opacity:.8; }
+
+.uv-book{ display:flex; flex-direction:column; gap:3px; min-width:0; }
+.uv-book strong{
+  font:700 14px/1.25 var(--ub-font); color: var(--ub-navy); overflow-wrap:anywhere;
+  display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;
+}
+.uv-book span{ font:500 12.5px/1.3 var(--ub-font); color: var(--ub-slate); overflow-wrap:anywhere; }
+
+.uv-date{ display:block; font-weight:700; white-space:nowrap; }
+.uv-time{ display:block; margin-top:2px; font:500 12px/1.2 var(--ub-font); color: var(--ub-slate); }
+.uv-method{ margin-top:5px; }
+
+.uv-type{
+  display:inline-flex; align-items:center; gap:5px; padding:4px 10px 4px 8px; border-radius:999px;
+  background: rgba(44,111,209,.11); color: var(--ub-blue);
+  font:700 11.5px/1 var(--ub-font);
+}
+.uv-type i{ font-size:11px; }
+html[data-theme="dark"] .uv-type{ background: rgba(140,185,255,.16); color:#9cc4ff; }
+
+.uv-amount{ font:800 15px/1 var(--ub-font); letter-spacing:-.01em; color: var(--ub-slate); font-variant-numeric: tabular-nums; white-space:nowrap; }
+.uv-row.is-income .uv-amount{ color: var(--uv-money); }
+
+.uv-cell-action{ text-align:right; white-space:nowrap; }
+
+.uv-more{
+  display:block; margin:14px auto 0; padding:11px 22px; border-radius:999px;
+  background: rgba(255,255,255,.6); border:1px solid var(--uv-card-edge);
+  font:700 13px/1 var(--ub-font); color: var(--ub-navy); cursor:pointer;
+  box-shadow: 0 6px 16px rgba(46,84,140,.10), inset 0 1px 0 rgba(255,255,255,.9);
+  transition: transform .2s ease, background-color .2s ease;
+}
+@media (hover:hover){ .uv-more:hover{ background:#fff; transform: translateY(-1px); } }
+.uv-more:active{ transform: scale(.97); }
+.uv-more:focus-visible{ outline:3px solid var(--uv-ring); outline-offset:3px; }
+html[data-theme="dark"] .uv-more{ background: rgba(255,255,255,.09); }
+
+
+/* ==========================================================================
+   13. BOTONES Y ESTADOS
+   ========================================================================== */
+
+.uv-status{
+  display:inline-flex; align-items:center; gap:7px; padding:6px 12px 6px 10px; border-radius:999px;
+  font:700 12px/1 var(--ub-font); white-space:nowrap;
+}
+.uv-status::before{ content:""; width:7px; height:7px; border-radius:50%; background: currentColor; }
+.uv-status--success{ background: var(--uv-ok-bg); color: var(--uv-ok-fg); }
+.uv-status--warning{ background: var(--uv-wa-bg); color: var(--uv-wa-fg); }
+.uv-status--danger { background: var(--uv-no-bg); color: var(--uv-no-fg); }
+.uv-status--neutral{ background: var(--uv-ne-bg); color: var(--uv-ne-fg); }
+
+/* Selector reforzado para ganar a los estilos globales de enlaces */
+body.ub-glass .uv a.uv-btn{
+  display:inline-flex; align-items:center; justify-content:center; gap:9px;
+  min-height:46px; padding:12px 24px; border:0; border-radius:999px;
+  background: linear-gradient(180deg, #1c5a96 0%, #0a2f56 100%);
+  color:#fff; text-decoration:none; font:700 14px/1 var(--ub-font);
+  box-shadow: 0 10px 22px rgba(11,52,93,.30), inset 0 1px 0 rgba(255,255,255,.22);
+  transition: transform .22s cubic-bezier(.22,.8,.3,1), box-shadow .22s ease, filter .22s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+body.ub-glass .uv a.uv-btn--sm{ min-height:38px; padding:0 16px; font-size:12.5px; gap:7px; }
+body.ub-glass .uv a.uv-btn i{ font-size:13px; line-height:1; transition: transform .22s ease; }
+@media (hover:hover){
+  body.ub-glass .uv a.uv-btn:hover{
+    color:#fff; filter:brightness(1.08); transform: translateY(-2px);
+    box-shadow: 0 14px 28px rgba(11,52,93,.36), inset 0 1px 0 rgba(255,255,255,.26);
+  }
+  body.ub-glass .uv a.uv-btn:hover i{ transform: translate(2px,-2px); }
+}
+body.ub-glass .uv a.uv-btn:active{ color:#fff; transform: scale(.97); filter:brightness(.96); box-shadow: 0 5px 12px rgba(11,52,93,.30); }
+body.ub-glass .uv a.uv-btn:focus-visible{ color:#fff; outline:3px solid var(--uv-ring); outline-offset:3px; }
+html[data-theme="dark"] body.ub-glass .uv a.uv-btn{ background: linear-gradient(180deg, #2f6fb5 0%, #17457c 100%); }
+
+
+/* ==========================================================================
+   14. ESTADO VACÍO
+   ========================================================================== */
+
+.uv-empty{
+  margin-top:8px; padding:50px 26px 54px;
+  display:flex; flex-direction:column; align-items:center; text-align:center;
+  border-radius:32px;
+  background: radial-gradient(50% 60% at 50% 0%, rgba(64,124,226,.18), transparent 70%), var(--uv-card);
+  border:1px solid var(--uv-card-edge);
+  box-shadow: 0 20px 48px rgba(46,84,140,.15), inset 0 1px 0 rgba(255,255,255,.95);
+  -webkit-backdrop-filter: var(--uv-blur); backdrop-filter: var(--uv-blur);
+}
+.uv-empty__art{ position:relative; width:132px; height:132px; margin-bottom:22px; display:grid; place-items:center; }
+.uv-empty__ring{
+  position:absolute; border-radius:50%; border:1px solid rgba(255,255,255,.9);
+  background: radial-gradient(circle at 30% 26%, rgba(255,255,255,.8), rgba(207,226,251,.35));
+  box-shadow: 0 12px 30px rgba(46,84,140,.14);
+}
+.uv-empty__ring--outer{ inset:0; opacity:.6; }
+.uv-empty__ring--inner{ inset:20px; }
+.uv-empty__icon{ position:relative; font-size:40px; line-height:1; color: var(--ub-blue); }
+html[data-theme="dark"] .uv-empty__ring{ border-color: rgba(255,255,255,.14); background: radial-gradient(circle at 30% 26%, rgba(255,255,255,.14), rgba(90,140,220,.10)); box-shadow:none; }
+.uv .uv-empty h2{ margin:0 0 8px; font:700 22px/1.2 var(--ub-font); letter-spacing:-.015em; color: var(--ub-navy); }
+.uv-empty p{ max-width:46ch; margin:0 0 24px; font-size:14.5px; line-height:1.6; color: var(--ub-slate); }
+
+
+/* ==========================================================================
+   15. ANIMACIÓN DE ENTRADA (una sola, escalonada y breve)
+   ========================================================================== */
+
+.uv-rise{ animation: uvRise .6s cubic-bezier(.22,.8,.3,1) both; animation-delay: calc(var(--i, 0) * 65ms); }
+@keyframes uvRise{ from{ opacity:0; transform: translateY(14px); } to{ opacity:1; transform:none; } }
+
+
+/* ==========================================================================
+   16. CONTENEDOR ADAPTABLE (según el ancho real disponible)
+   ========================================================================== */
+
+/* Medio: indicadores 2×2 bajo la tarjeta de ingresos; gráficas apiladas */
+@container uv (max-width: 980px){
+  .uv-kpis{ grid-template-columns: repeat(4, minmax(0,1fr)); }
+  .uv-kpi{ grid-column: span 2; }
+  .uv-kpi--featured{ grid-column: span 4; }
+  .uv-kpi__value{ font-size:30px; }
+  .uv-kpi--featured .uv-kpi__value{ font-size:42px; }
+  .uv-grid--main{ grid-template-columns: minmax(0,1fr); }
+  .uv-grid--main .uv-panel:nth-child(2){ display:grid; grid-template-columns: 176px minmax(0,1fr); column-gap:26px; align-items:center; }
+  .uv-grid--main .uv-panel:nth-child(2) .uv-panel__head{ grid-column: 1 / -1; }
+  .uv-grid--main .uv-panel:nth-child(2) .uv-donut{ margin:0; }
+}
+
+/* Cabecera en una columna */
+@container uv (max-width: 820px){
+  .uv-hero{ grid-template-columns: minmax(0,1fr); gap:20px; padding-bottom:20px; }
+  .uv-hero__tools{ align-items:flex-start; }
+  .uv-range, .uv-updated{ justify-content:flex-start; }
+}
+
+/* Tabla en modo "tarjeta" */
+@container uv (max-width: 940px){
+  .uv-tablewrap{ margin:0; }
+  .uv-table, .uv-table tbody{ display:block; }
+  .uv-table thead{ display:none; }
+
+  .uv-table tbody tr{
+    display:grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap:14px 16px;
+    padding:16px; margin-bottom:12px; border-radius:22px;
+    background: rgba(255,255,255,.46); border:1px solid var(--uv-card-edge);
+    box-shadow: 0 8px 20px rgba(46,84,140,.09), inset 0 1px 0 rgba(255,255,255,.9);
+  }
+  html[data-theme="dark"] .uv-table tbody tr{ background: rgba(255,255,255,.06); box-shadow:none; }
+  .uv-table tbody tr:last-child{ margin-bottom:0; }
+  .uv-table tbody td{ display:block; padding:0; border:0; border-radius:0 !important; }
+  .uv-table tbody tr:hover td{ background:none; }
+
+  .uv-table tbody td::before{
+    content: attr(data-label); display:block; margin-bottom:4px;
+    font:700 11px/1 var(--ub-font); letter-spacing:.02em; color: var(--ub-slate);
+  }
+  .uv-table tbody td.uv-cell-book{ display:flex; grid-column: 1 / -1; min-width:0; }
+  .uv-table tbody td.uv-cell-book::before,
+  .uv-table tbody td.uv-cell-action::before{ display:none; }
+  .uv-table td.is-num{ text-align:left; }
+  .uv-table tbody td.uv-cell-action{ grid-column: 1 / -1; text-align:left; }
+  .uv-table tbody td.uv-cell-action .uv-btn{ width:100%; }
+  .uv-cover{ width:52px; }
+}
+
+/* Estrecho */
+@container uv (max-width: 640px){
+  .uv-grid--pair{ grid-template-columns: minmax(0,1fr); }
+  .uv-panel{ padding:18px 16px 20px; border-radius:26px; }
+  .uv-grid--main .uv-panel:nth-child(2){ display:block; }
+  .uv-grid--main .uv-panel:nth-child(2) .uv-donut{ margin:2px auto 20px; }
+  .uv-kpis{ grid-template-columns: repeat(2, minmax(0,1fr)); gap:10px; }
+  .uv-kpi{ grid-column: span 1; padding:15px 14px 14px; border-radius:22px; }
+  .uv-kpi--featured{ grid-column: 1 / -1; }
+  .uv-kpi__head{ align-items:flex-start; }
+  .uv-kpi__icon{ width:34px; height:34px; border-radius:11px; font-size:15px; }
+  .uv-panel__head{ flex-wrap:wrap; }
+  .uv-empty{ padding:38px 20px 42px; border-radius:26px; }
+}
+@container uv (max-width: 330px){
+  .uv-kpis{ grid-template-columns: minmax(0,1fr); }
+  .uv-table tbody tr{ grid-template-columns: minmax(0,1fr); }
+}
+@container uv (max-width: 560px){
+  .uv-periods{ display:flex; width:100%; }
+  body.ub-glass .uv a.uv-periods__item{ flex:1; padding:0 6px; }
+}
+
+
+/* ==========================================================================
+   17. MOVIMIENTO REDUCIDO
+   ========================================================================== */
+
+@media (prefers-reduced-motion: reduce){
+  .uv-rise, .uv-bar.is-grow, .uv-donut__seg, .uv-hbar__fill{ animation:none; }
+  .uv-kpi, .uv-hit, .uv-bar, body.ub-glass .uv a.uv-btn, body.ub-glass .uv a.uv-btn i,
+  body.ub-glass .uv a.uv-periods__item, body.ub-glass .uv a.uv-refresh, .uv-more{ transition:none; }
+  .uv-kpi:hover{ transform:none; }
+}

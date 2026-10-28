@@ -1,0 +1,289 @@
+/* ==========================================================================
+   UNIBOOK — Centro de notificaciones (glassmorphism)
+   --------------------------------------------------------------------------
+   Hoja AISLADA: solo se enlaza desde views/notificaciones.php y todas sus
+   clases empiezan por .ub-notif, así que no puede afectar a ninguna otra
+   pantalla. Reutiliza los tokens de ub-glass.css (colores, tema oscuro).
+   ========================================================================== */
+
+.ub-notif{
+  --nf-blur: blur(22px) saturate(190%);
+  --nf-edge: rgba(255,255,255,.72);
+  max-width:860px;
+  margin:0 auto;
+}
+
+/* ---------- Escenario: aurora de color detrás del cristal ---------- */
+
+.ub-notif__stage{
+  position:relative; isolation:isolate; overflow:hidden;
+  padding:30px 26px 34px;
+  border-radius:32px;
+  border:1px solid var(--nf-edge);
+  background:
+    radial-gradient(42% 26% at 10% 24%, rgba(64,124,226,.42), transparent 70%),
+    radial-gradient(36% 24% at 92% 40%, rgba(222,176,104,.42), transparent 70%),
+    radial-gradient(44% 26% at 14% 74%, rgba(72,176,176,.34), transparent 70%),
+    radial-gradient(40% 26% at 88% 92%, rgba(124,112,226,.30), transparent 70%),
+    linear-gradient(170deg, rgba(236,243,252,.85), rgba(222,233,248,.70));
+  box-shadow: 0 26px 64px rgba(46,84,140,.20), inset 0 1px 0 rgba(255,255,255,.9);
+}
+
+/* Banda superior con la fotografía de los libros, fundida hacia abajo */
+.ub-notif__stage::before{
+  content:""; position:absolute; z-index:-1; top:70px; right:0;
+  width:min(100%,765px); height:300px;
+  background: url("../img/hero-libros.jpg") right top / auto 300px no-repeat;
+  -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 22%, #000 55%, transparent 100%), linear-gradient(90deg, transparent 0, #000 28%);
+  -webkit-mask-composite: source-in;
+  mask-image: linear-gradient(180deg, transparent 0, #000 22%, #000 55%, transparent 100%), linear-gradient(90deg, transparent 0, #000 28%);
+  mask-composite: intersect;
+  opacity:.9;
+  pointer-events:none;
+}
+
+/* ---------- Encabezado de la sección ---------- */
+
+.ub-notif__head{
+  display:flex; align-items:flex-end; justify-content:space-between; flex-wrap:wrap; gap:16px;
+  margin-bottom:20px;
+}
+.ub-notif__eyebrow{
+  display:block; margin-bottom:8px;
+  font:600 12px/1 var(--ub-font); color: var(--ub-gold-deep);
+}
+.ub-notif__head h1{
+  margin:0 0 6px;
+  font:700 28px/1.15 var(--ub-font); letter-spacing:-.02em;
+  color: var(--ub-navy);
+}
+.ub-notif__head h1 .bi{ font-size:.8em; margin-left:6px; color: var(--ub-blue); }
+.ub-notif__head p{ margin:0; font-size:13.5px; color: var(--ub-slate); }
+
+/* ---------- Botones de cristal ---------- */
+
+.ub-notif__btn{
+  display:inline-flex; align-items:center; justify-content:center; gap:8px;
+  min-height:40px; padding:0 20px;
+  border:1px solid var(--nf-edge);
+  border-radius:999px;
+  background: linear-gradient(135deg, rgba(255,255,255,.62), rgba(255,255,255,.28));
+  -webkit-backdrop-filter: blur(14px) saturate(170%); backdrop-filter: blur(14px) saturate(170%);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.9), 0 8px 20px rgba(46,84,140,.14);
+  font:600 12.5px/1 var(--ub-font); white-space:nowrap;
+  color: var(--ub-navy);
+  cursor:pointer;
+  transition: transform .2s ease, box-shadow .2s ease, background .2s ease, filter .2s ease;
+}
+.ub-notif__btn:hover{ transform: translateY(-2px); color: var(--ub-navy); box-shadow: inset 0 1px 0 #fff, 0 12px 26px rgba(46,84,140,.2); }
+.ub-notif__btn:active{ transform: translateY(0) scale(.98); }
+.ub-notif__btn:disabled{ opacity:.5; cursor:default; transform:none; box-shadow: inset 0 1px 0 rgba(255,255,255,.9); }
+.ub-notif__btn--sm{ min-height:34px; padding:0 16px; font-size:12px; }
+.ub-notif__btn--primary{
+  background: linear-gradient(180deg, rgba(22,71,119,.92), rgba(10,47,86,.92));
+  border-color: rgba(255,255,255,.22);
+  color:#fff;
+  box-shadow: 0 10px 22px rgba(11,52,93,.30), inset 0 1px 0 rgba(255,255,255,.22);
+}
+.ub-notif__btn--primary:hover{ color:#fff; filter:brightness(1.12); }
+
+/* ---------- Contador de pendientes ---------- */
+
+.ub-notif__count{
+  display:inline-flex; align-items:center; gap:9px;
+  margin-bottom:6px; padding:11px 18px;
+  border:1px solid var(--nf-edge); border-radius:999px;
+  background: linear-gradient(135deg, rgba(255,255,255,.55), rgba(255,255,255,.22));
+  -webkit-backdrop-filter: var(--nf-blur); backdrop-filter: var(--nf-blur);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.9), 0 8px 22px rgba(46,84,140,.12);
+  font-size:13px; color: var(--ub-slate);
+}
+.ub-notif__count strong{ color:#1f58b3; font-weight:700; }
+.ub-notif__count-dot{
+  width:9px; height:9px; border-radius:50%;
+  background: var(--ub-blue);
+  box-shadow: 0 0 0 3px rgba(44,111,209,.2), 0 0 10px rgba(44,111,209,.55);
+}
+
+/* ---------- Lista y grupos ---------- */
+
+.ub-notif__list{ display:flex; flex-direction:column; gap:12px; }
+.ub-notif__group{
+  margin:16px 6px 2px;
+  font:700 15px/1.2 var(--ub-font); letter-spacing:-.005em;
+  color: var(--ub-navy);
+  text-shadow: 0 1px 10px rgba(255,255,255,.7);
+}
+.ub-notif__list > .ub-notif__group:first-child{ margin-top:10px; }
+
+/* ---------- Tarjeta de cristal ---------- */
+
+.ub-notif-card{
+  position:relative;
+  display:flex; gap:15px;
+  padding:16px 18px 16px 18px;
+  border-radius:26px;
+  border:1px solid var(--nf-edge);
+  background:
+    linear-gradient(135deg, rgba(255,255,255,.50) 0%, rgba(255,255,255,.14) 46%, rgba(255,255,255,.24) 100%);
+  -webkit-backdrop-filter: var(--nf-blur); backdrop-filter: var(--nf-blur);
+  box-shadow:
+    0 16px 36px rgba(20,50,100,.16),
+    0 2px 6px rgba(20,50,100,.06),
+    inset 0 1px 0 rgba(255,255,255,.9),
+    inset 0 -1px 0 rgba(255,255,255,.28),
+    inset 0 0 26px rgba(255,255,255,.16);
+  transition: opacity .7s var(--ease, ease), transform .35s ease, box-shadow .3s ease, background-color .3s ease;
+}
+.ub-notif .ub-notif-card.is-visible:hover{
+  transform: translateY(-3px);
+  box-shadow:
+    0 22px 44px rgba(20,50,100,.22),
+    0 2px 6px rgba(20,50,100,.06),
+    inset 0 1px 0 #fff,
+    inset 0 -1px 0 rgba(255,255,255,.3),
+    inset 0 0 26px rgba(255,255,255,.2);
+}
+
+/* reflejo suave en la esquina superior */
+.ub-notif-card::after{
+  content:""; position:absolute; inset:0; border-radius:inherit; pointer-events:none;
+  background: linear-gradient(160deg, rgba(255,255,255,.34) 0%, rgba(255,255,255,0) 34%);
+}
+
+/* No leída: algo más de cuerpo, punto con resplandor y título más marcado */
+.ub-notif-card.is-unread{
+  padding-left:30px;
+  background:
+    linear-gradient(135deg, rgba(255,255,255,.62) 0%, rgba(220,234,252,.26) 50%, rgba(255,255,255,.32) 100%);
+}
+.ub-notif-card__pulse{
+  position:absolute; z-index:2; left:12px; top:50%; margin-top:-5px;
+  width:10px; height:10px; border-radius:50%;
+  background: var(--ub-blue);
+  box-shadow: 0 0 0 3px rgba(44,111,209,.2), 0 0 12px rgba(44,111,209,.6);
+}
+.ub-notif-card.is-read .ub-notif-card__icon{ opacity:.82; filter:saturate(.8); }
+.ub-notif-card.is-read .ub-notif-card__title{ font-weight:600; }
+.ub-notif-card.is-read .ub-notif-card__text{ opacity:.85; }
+
+/* ---------- Icono (cristal teñido según el tipo) ---------- */
+
+.ub-notif-card__icon{
+  position:relative; flex:none;
+  display:grid; place-items:center;
+  width:48px; height:48px; border-radius:16px;
+  background: linear-gradient(145deg, #5b8fd8, #1a4a8c);
+  border:1px solid rgba(255,255,255,.7);
+  box-shadow: 0 8px 18px rgba(30,70,130,.28), inset 0 1px 0 rgba(255,255,255,.5);
+  color:#fff; font-size:22px;
+}
+.ub-notif-card__icon::after{
+  content:""; position:absolute; inset:0; border-radius:inherit; pointer-events:none;
+  background: linear-gradient(150deg, rgba(255,255,255,.4), rgba(255,255,255,0) 55%);
+}
+.ub-notif-card--green .ub-notif-card__icon{ background: linear-gradient(145deg, #4fc79b, #1f8a63); box-shadow: 0 8px 18px rgba(31,138,99,.3), inset 0 1px 0 rgba(255,255,255,.5); }
+.ub-notif-card--red   .ub-notif-card__icon{ background: linear-gradient(145deg, #ff8a98, #d83a4d); box-shadow: 0 8px 18px rgba(216,58,77,.3), inset 0 1px 0 rgba(255,255,255,.5); }
+.ub-notif-card--gold  .ub-notif-card__icon{ background: linear-gradient(145deg, #e8cb92, #b08a4a); box-shadow: 0 8px 18px rgba(176,138,74,.3), inset 0 1px 0 rgba(255,255,255,.5); }
+.ub-notif-card--slate .ub-notif-card__icon{ background: linear-gradient(145deg, #a2b5d0, #5b7096); box-shadow: 0 8px 18px rgba(91,112,150,.3), inset 0 1px 0 rgba(255,255,255,.5); }
+
+/* ---------- Contenido ---------- */
+
+.ub-notif-card__body{ position:relative; flex:1; min-width:0; }
+.ub-notif-card__top{ display:flex; align-items:baseline; justify-content:space-between; gap:12px; margin-bottom:4px; }
+.ub-notif-card__kind{ font:600 11.5px/1.2 var(--ub-font); color: var(--ub-slate); }
+.ub-notif-card__time{ flex:none; font:500 11.5px/1.2 var(--ub-font); color: var(--ub-slate); }
+.ub-notif-card.is-unread .ub-notif-card__time{ color:#1f58b3; font-weight:700; }
+
+.ub-notif-card__title{
+  margin:0 0 4px;
+  font:700 15px/1.3 var(--ub-font); letter-spacing:-.005em;
+  color: var(--ub-navy);
+}
+.ub-notif-card__open{ color: inherit; }
+.ub-notif-card__open:hover{ color: inherit; }
+/* toda la tarjeta abre el contenido relacionado */
+.ub-notif-card__open::after{ content:""; position:absolute; inset:-16px -18px; border-radius:26px; z-index:1; }
+.ub-notif-card__text{ margin:0; font:400 13px/1.5 var(--ub-font); color: var(--ub-ink); overflow-wrap:anywhere; }
+
+.ub-notif-card__actions{ position:relative; z-index:2; display:flex; flex-wrap:wrap; gap:8px; margin-top:12px; }
+.ub-notif-card__actions form{ margin:0; }
+
+.ub-notif-card:has(.ub-notif-card__open:focus-visible){ outline:2px solid var(--ub-blue); outline-offset:3px; }
+.ub-notif-card__open:focus-visible{ outline:none; }
+
+/* ---------- Estado vacío ---------- */
+
+.ub-notif__empty{
+  display:flex; flex-direction:column; align-items:center; text-align:center;
+  margin-top:10px; padding:54px 24px;
+  border:1px solid var(--nf-edge); border-radius:28px;
+  background: linear-gradient(135deg, rgba(255,255,255,.5), rgba(255,255,255,.18));
+  -webkit-backdrop-filter: var(--nf-blur); backdrop-filter: var(--nf-blur);
+  box-shadow: 0 16px 36px rgba(20,50,100,.14), inset 0 1px 0 rgba(255,255,255,.9);
+}
+.ub-notif__empty-icon{
+  display:grid; place-items:center; width:64px; height:64px; margin-bottom:16px;
+  border-radius:20px; font-size:28px; color:#fff;
+  background: linear-gradient(145deg, #5b8fd8, #1a4a8c);
+  box-shadow: 0 10px 22px rgba(30,70,130,.3), inset 0 1px 0 rgba(255,255,255,.5);
+}
+.ub-notif__empty h2{ margin:0 0 6px; font:700 19px/1.2 var(--ub-font); color: var(--ub-navy); }
+.ub-notif__empty p{ margin:0 0 22px; max-width:340px; font-size:13.5px; color: var(--ub-slate); }
+
+/* ---------- Sin soporte de backdrop-filter: más cuerpo para no perder legibilidad ---------- */
+
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))){
+  .ub-notif-card, .ub-notif__count, .ub-notif__empty, .ub-notif__btn{ background-color: rgba(255,255,255,.82); }
+}
+
+/* ---------- Modo oscuro ---------- */
+
+html[data-theme="dark"] .ub-notif{ --nf-edge: rgba(160,196,255,.26); }
+html[data-theme="dark"] .ub-notif__stage{
+  background:
+    radial-gradient(42% 26% at 10% 24%, rgba(64,124,226,.40), transparent 70%),
+    radial-gradient(36% 24% at 92% 40%, rgba(222,176,104,.22), transparent 70%),
+    radial-gradient(44% 26% at 14% 74%, rgba(72,176,176,.26), transparent 70%),
+    radial-gradient(40% 26% at 88% 92%, rgba(124,112,226,.30), transparent 70%),
+    linear-gradient(170deg, rgba(12,26,54,.92), rgba(16,32,66,.88));
+  box-shadow: 0 26px 64px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.08);
+}
+html[data-theme="dark"] .ub-notif__stage::before{ opacity:.4; }
+html[data-theme="dark"] .ub-notif-card{
+  background: linear-gradient(135deg, rgba(120,160,230,.20) 0%, rgba(30,56,104,.30) 50%, rgba(60,96,170,.18) 100%);
+  box-shadow: 0 16px 36px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.14), inset 0 0 26px rgba(255,255,255,.04);
+}
+html[data-theme="dark"] .ub-notif-card.is-unread{ background: linear-gradient(135deg, rgba(120,170,255,.30) 0%, rgba(40,72,134,.34) 50%, rgba(80,120,200,.22) 100%); }
+html[data-theme="dark"] .ub-notif-card::after{ background: linear-gradient(160deg, rgba(255,255,255,.10), rgba(255,255,255,0) 34%); }
+html[data-theme="dark"] .ub-notif__btn{ background: linear-gradient(135deg, rgba(255,255,255,.16), rgba(255,255,255,.06)); color: var(--ub-navy); }
+html[data-theme="dark"] .ub-notif__btn--primary{ background: linear-gradient(180deg, #3a73c0, #24528f); color:#fff; }
+html[data-theme="dark"] .ub-notif__count,
+html[data-theme="dark"] .ub-notif__empty{ background: linear-gradient(135deg, rgba(255,255,255,.12), rgba(255,255,255,.04)); }
+html[data-theme="dark"] .ub-notif-card.is-unread .ub-notif-card__time,
+html[data-theme="dark"] .ub-notif__count strong{ color:#9cc4ff; }
+html[data-theme="dark"] .ub-notif__group{ text-shadow:none; }
+
+/* ---------- Tableta y móvil ---------- */
+
+@media (max-width: 760px){
+  .ub-notif__stage{ padding:24px 18px 28px; border-radius:28px; }
+}
+@media (max-width: 560px){
+  .ub-notif__stage{ padding:18px 12px 22px; border-radius:24px; }
+  .ub-notif__head h1{ font-size:24px; }
+  .ub-notif__head form, .ub-notif__head .ub-notif__btn{ width:100%; }
+  .ub-notif-card{ gap:12px; padding:14px; border-radius:22px; }
+  .ub-notif-card.is-unread{ padding-left:26px; }
+  .ub-notif-card__pulse{ left:10px; }
+  .ub-notif-card__icon{ width:42px; height:42px; border-radius:14px; font-size:19px; }
+  .ub-notif-card__open::after{ inset:-14px; border-radius:22px; }
+  .ub-notif-card__actions .ub-notif__btn{ flex:1 1 auto; padding:0 14px; }
+  .ub-notif-card__actions form{ flex:1 1 auto; display:flex; }
+  .ub-notif-card__actions form .ub-notif__btn{ width:100%; }
+}
+
+@media (prefers-reduced-motion: reduce){
+  .ub-notif-card, .ub-notif__btn{ transition:none; }
+  .ub-notif .ub-notif-card.is-visible:hover{ transform:none; }
+}

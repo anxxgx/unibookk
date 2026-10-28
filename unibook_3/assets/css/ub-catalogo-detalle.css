@@ -1,0 +1,781 @@
+/* ==========================================================================
+   UNIBOOK — Acabado premium del CATÁLOGO y del DETALLE DE LIBRO
+   --------------------------------------------------------------------------
+   Se carga después de ub-glass.css y ub-glass-pages.css (solo en las acciones
+   `catalogo` y `detalle_libro`, ver index.php). Todo está acotado con la clase
+   que index.php pone en <body>:
+
+       C = body.ub-glass.ub-accion-catalogo
+       D = body.ub-glass.ub-accion-detalle_libro
+
+   No toca estilos globales ni otras páginas. Usa los tokens existentes
+   (--ub-*), por lo que respeta el modo claro/oscuro.
+
+   Índice
+     0. Tokens locales
+     1. Catálogo: banner
+     2. Catálogo: cuadrícula y tarjetas
+     3. Portadas (compartido catálogo / detalle)
+     4. Detalle: botón «Volver al catálogo»
+     5. Detalle: composición, portada, encabezado, acciones
+     6. Detalle: datos académicos, descripción, vendedor
+     7. Animaciones
+     8. Responsive
+     9. Movimiento reducido
+   ========================================================================== */
+
+
+/* ==========================================================================
+   0. TOKENS LOCALES
+   ========================================================================== */
+
+body.ub-glass.ub-accion-catalogo,
+body.ub-glass.ub-accion-detalle_libro{
+  --bk-ring:        rgba(44,111,209,.34);
+  --bk-line:        rgba(44,111,209,.26);
+  --bk-tile:        rgba(255,255,255,.58);
+  --bk-tile-edge:   rgba(255,255,255,.95);
+  --bk-card:        rgba(255,255,255,.58);
+  --bk-card-edge:   rgba(255,255,255,.92);
+  --bk-cover-a:     #dbe8f9;
+  --bk-cover-b:     #bcd3ee;
+  --bk-ease:        cubic-bezier(.22,.61,.36,1);
+}
+
+html[data-theme="dark"] body.ub-glass.ub-accion-catalogo,
+html[data-theme="dark"] body.ub-glass.ub-accion-detalle_libro{
+  --bk-ring:        rgba(127,176,255,.5);
+  --bk-line:        rgba(160,196,255,.34);
+  --bk-tile:        rgba(255,255,255,.06);
+  --bk-tile-edge:   rgba(160,196,255,.18);
+  --bk-card:        rgba(255,255,255,.07);
+  --bk-card-edge:   rgba(160,196,255,.2);
+  --bk-cover-a:     #1c3560;
+  --bk-cover-b:     #12264a;
+}
+
+
+/* ==========================================================================
+   1. CATÁLOGO — BANNER
+   ========================================================================== */
+
+body.ub-glass.ub-accion-catalogo .catalog-hero{
+  display:flex; align-items:center;
+  min-height:248px;
+  margin-bottom:26px;
+  padding:42px 46px;
+  background:
+    var(--ub-sheen),
+    linear-gradient(100deg, rgba(210,226,246,.92) 0%, rgba(228,239,252,.74) 52%, rgba(246,250,255,.5) 100%);
+  border-radius:32px;
+  -webkit-backdrop-filter: var(--ub-blur);
+  backdrop-filter: var(--ub-blur);
+}
+html[data-theme="dark"] body.ub-glass.ub-accion-catalogo .catalog-hero{
+  background:
+    var(--ub-sheen),
+    linear-gradient(100deg, rgba(30,56,104,.85) 0%, rgba(24,44,82,.7) 55%, rgba(18,34,66,.55) 100%);
+}
+
+/* Halo de luz (reemplaza el degradado dorado heredado, que estaba oculto) */
+body.ub-glass.ub-accion-catalogo .catalog-hero::before{
+  display:block; content:"";
+  position:absolute; z-index:-1; inset:auto;
+  top:-170px; left:-110px; width:440px; height:440px;
+  background: radial-gradient(circle, rgba(255,255,255,.85), rgba(255,255,255,0) 66%);
+  pointer-events:none;
+}
+html[data-theme="dark"] body.ub-glass.ub-accion-catalogo .catalog-hero::before{
+  background: radial-gradient(circle, rgba(127,176,255,.28), rgba(127,176,255,0) 66%);
+}
+
+/* Imagen de la derecha: se funde con el vidrio */
+body.ub-glass.ub-accion-catalogo .catalog-hero::after{
+  width:min(52%,600px);
+  -webkit-mask-image: linear-gradient(90deg, transparent 0, rgba(0,0,0,.55) 22%, #000 52%);
+  mask-image: linear-gradient(90deg, transparent 0, rgba(0,0,0,.55) 22%, #000 52%);
+  opacity:.95;
+}
+html[data-theme="dark"] body.ub-glass.ub-accion-catalogo .catalog-hero::after{ opacity:.5; }
+
+body.ub-glass.ub-accion-catalogo .catalog-hero__inner{ max-width:540px; }
+
+body.ub-glass.ub-accion-catalogo .catalog-hero .ub-eyebrow{
+  padding:6px 12px;
+  background: var(--ub-gold-soft);
+  border-radius:999px;
+  font-size:11.5px;
+  color: var(--ub-gold-deep);
+}
+
+body.ub-glass.ub-accion-catalogo .catalog-hero__title{
+  margin:16px 0 12px;
+  font:700 clamp(26px, 3.2vw, 36px)/1.15 var(--ub-font);
+  letter-spacing:-.02em;
+}
+body.ub-glass.ub-accion-catalogo .catalog-hero__lead{
+  margin:0 0 24px;
+  max-width:460px;
+  font-size:14px; line-height:1.6;
+  color: var(--ub-slate);
+}
+
+body.ub-glass.ub-accion-catalogo .catalog-search{ max-width:460px; }
+body.ub-glass.ub-accion-catalogo .catalog-search__input{
+  height:52px;
+  background: var(--ub-glass-3);
+  border:1px solid var(--bk-tile-edge);
+  box-shadow: var(--ub-inset), 0 10px 26px rgba(46,84,140,.14);
+  font-size:14px;
+  transition: border-color .2s ease, box-shadow .2s ease, background .2s ease;
+}
+body.ub-glass.ub-accion-catalogo .catalog-search__input:focus{
+  border-color: var(--bk-ring);
+  box-shadow: 0 0 0 4px var(--bk-ring), 0 10px 26px rgba(46,84,140,.14);
+}
+
+body.ub-glass.ub-accion-catalogo .catalog-toolbar{ margin-bottom:18px; padding-left:4px; }
+
+
+/* ==========================================================================
+   2. CATÁLOGO — CUADRÍCULA Y TARJETAS
+   ========================================================================== */
+
+/* Cuadrícula fluida (sustituye las columnas fijas de Bootstrap sin cambiar el HTML) */
+body.ub-glass.ub-accion-catalogo .catalog-grid{
+  display:grid;
+  grid-template-columns: repeat(auto-fill, minmax(256px, 1fr));
+  gap:20px;
+  margin:0;
+}
+body.ub-glass.ub-accion-catalogo .catalog-grid > .libro-card{
+  width:auto; max-width:none;
+  margin:0 !important; padding:0;
+  min-width:0;
+}
+
+body.ub-glass.ub-accion-catalogo .book-card{
+  position:relative;
+  padding:10px;
+  background: var(--bk-card);
+  border:1px solid var(--bk-card-edge);
+  border-radius:24px;
+  box-shadow: var(--ub-shadow-sm), var(--ub-inset);
+  -webkit-backdrop-filter: blur(18px) saturate(160%);
+  backdrop-filter: blur(18px) saturate(160%);
+  transition: transform .28s var(--bk-ease), box-shadow .28s var(--bk-ease), border-color .28s var(--bk-ease);
+}
+body.ub-glass.ub-accion-catalogo .book-card:hover{
+  transform: translateY(-4px);
+  box-shadow: 0 24px 50px rgba(46,84,140,.2), 0 3px 10px rgba(46,84,140,.07), var(--ub-inset);
+  border-color:#fff;
+}
+html[data-theme="dark"] body.ub-glass.ub-accion-catalogo .book-card:hover{
+  border-color: rgba(160,196,255,.38);
+  box-shadow: 0 24px 50px rgba(0,0,0,.45), var(--ub-inset);
+}
+body.ub-glass.ub-accion-catalogo .book-card:has(a:focus-visible){
+  box-shadow: 0 0 0 3px var(--bk-ring), var(--ub-shadow-sm);
+}
+
+/* Cuerpo */
+body.ub-glass.ub-accion-catalogo .book-card .body{ padding:16px 8px 4px; }
+body.ub-glass.ub-accion-catalogo .book-card h5{
+  display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical;
+  overflow:hidden; overflow-wrap:anywhere;
+  min-height:2.6em;               /* 2 líneas: alinea las tarjetas */
+  margin:0 0 12px;
+  font:700 16px/1.3 var(--ub-font);
+  letter-spacing:-.01em;
+}
+body.ub-glass.ub-accion-catalogo .book-card .meta-row{
+  gap:7px;
+  margin-bottom:14px;
+  font-size:12.5px; line-height:1.35;
+  color: var(--ub-slate);
+}
+body.ub-glass.ub-accion-catalogo .book-card .meta-row span{
+  display:block;
+  min-width:0;
+  overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+}
+body.ub-glass.ub-accion-catalogo .book-card .meta-row .ub-icon{
+  margin-right:8px;
+  color: var(--ub-blue);
+  font-size:1.05em;
+}
+body.ub-glass.ub-accion-catalogo .book-card .meta-row b{ font-weight:700; }
+
+body.ub-glass.ub-accion-catalogo .book-card .price{
+  margin-top:auto;
+  padding-top:12px;
+  border-top:1px solid var(--bk-tile-edge);
+  font:800 22px/1 var(--ub-font);
+  letter-spacing:-.02em;
+}
+html[data-theme="dark"] body.ub-glass.ub-accion-catalogo .book-card .price{ border-top-color: var(--bk-card-edge); }
+
+/* Pie y botón. El enlace se extiende por toda la tarjeta (mismo href). */
+body.ub-glass.ub-accion-catalogo .book-card .footer{ padding:14px 4px 4px; }
+body.ub-glass.ub-accion-catalogo .book-card .footer a.btn-ub{
+  min-height:44px;
+  font-size:13px;
+  transition: transform .2s var(--bk-ease), filter .2s ease, box-shadow .2s ease;
+}
+body.ub-glass.ub-accion-catalogo .book-card .footer a.btn-ub::after{
+  content:""; position:absolute; inset:0; border-radius:24px;
+}
+body.ub-glass.ub-accion-catalogo .book-card:hover .footer a.btn-ub{ filter:brightness(1.12); }
+body.ub-glass.ub-accion-catalogo .book-card .footer a.btn-ub:active{ transform:scale(.98); }
+body.ub-glass.ub-accion-catalogo .book-card .footer a.btn-ub:focus-visible{
+  outline:3px solid var(--bk-ring); outline-offset:3px; border-radius:999px;
+}
+
+/* Vacío de búsqueda */
+body.ub-glass.ub-accion-catalogo .catalog-empty{
+  padding:60px 24px;
+  background: var(--bk-card);
+  border-radius:24px;
+}
+
+
+/* ==========================================================================
+   3. PORTADAS (catálogo y detalle)
+   --------------------------------------------------------------------------
+   La imagen real se muestra COMPLETA (object-fit: contain) para no
+   recortarla ni deformarla; el hueco que deja se rellena con la misma imagen
+   desenfocada, lo que mantiene una proporción uniforme en toda la cuadrícula.
+   ========================================================================== */
+
+body.ub-glass.ub-accion-catalogo .book-card .cover,
+body.ub-glass.ub-accion-detalle_libro .book-detail__cover{
+  position:relative;
+  isolation:isolate;
+  overflow:hidden;
+  background: linear-gradient(145deg, var(--bk-cover-a), var(--bk-cover-b));
+}
+
+body.ub-glass.ub-accion-catalogo .book-card .cover{
+  height:auto;
+  aspect-ratio: 4 / 3;
+  border-radius:16px;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.5);
+}
+
+body.ub-glass.ub-accion-catalogo .cover .cover__bg,
+body.ub-glass.ub-accion-detalle_libro .book-detail__cover .cover__bg{
+  position:absolute; inset:-18px; z-index:0;
+  width:calc(100% + 36px); height:calc(100% + 36px);
+  object-fit:cover;
+  filter: blur(22px) saturate(1.25);
+  opacity:.75;
+  transform:none;
+}
+
+body.ub-glass.ub-accion-catalogo .cover .cover__img,
+body.ub-glass.ub-accion-detalle_libro .book-detail__cover .cover__img{
+  position:relative; z-index:1;
+  display:block;
+  width:100%; height:100%;
+  object-fit:contain;
+}
+body.ub-glass.ub-accion-catalogo .book-card .cover .cover__img{
+  transition: transform .5s var(--bk-ease);
+}
+body.ub-glass.ub-accion-catalogo .book-card:hover .cover .cover__img{ transform: scale(1.04); }
+
+/* Sin portada */
+body.ub-glass.ub-accion-catalogo .book-card .cover .no-image,
+body.ub-glass.ub-accion-detalle_libro .book-detail__cover .no-image{
+  position:relative; z-index:1;
+  display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px;
+  width:100%; height:100%;
+  background:
+    radial-gradient(70% 60% at 30% 20%, rgba(255,255,255,.7), transparent 70%),
+    linear-gradient(145deg, rgba(255,255,255,.18), rgba(255,255,255,0));
+  font:600 13px/1 var(--ub-font);
+  color: var(--ub-slate);
+}
+html[data-theme="dark"] body.ub-glass.ub-accion-catalogo .book-card .cover .no-image,
+html[data-theme="dark"] body.ub-glass.ub-accion-detalle_libro .book-detail__cover .no-image{
+  background: radial-gradient(70% 60% at 30% 20%, rgba(127,176,255,.18), transparent 70%);
+}
+body.ub-glass.ub-accion-catalogo .cover .no-image i,
+body.ub-glass.ub-accion-detalle_libro .book-detail__cover .no-image i{
+  display:grid; place-items:center;
+  width:52px; height:52px;
+  background: var(--ub-glass-3);
+  border:1px solid var(--bk-tile-edge);
+  border-radius:16px;
+  box-shadow: var(--ub-inset), var(--ub-shadow-sm);
+  font-size:24px;
+  color: var(--ub-blue);
+}
+
+/* Etiqueta Venta / Intercambio sobre la portada */
+body.ub-glass.ub-accion-catalogo .book-card .tag,
+body.ub-glass.ub-accion-detalle_libro .book-detail__tag{
+  position:absolute; z-index:3;
+  top:10px; left:10px;
+  padding:6px 13px;
+  border:1px solid rgba(255,255,255,.7);
+  border-radius:999px;
+  font:700 11px/1.2 var(--ub-font);
+  letter-spacing:.01em;
+  box-shadow: 0 4px 12px rgba(46,84,140,.14);
+  -webkit-backdrop-filter: blur(10px) saturate(160%);
+  backdrop-filter: blur(10px) saturate(160%);
+}
+body.ub-glass.ub-accion-catalogo .book-card .tag-venta,
+body.ub-glass.ub-accion-detalle_libro .book-detail__cover .tag-venta{
+  background: rgba(220,242,232,.88); color: var(--ub-green);
+}
+body.ub-glass.ub-accion-catalogo .book-card .tag-intercambio,
+body.ub-glass.ub-accion-detalle_libro .book-detail__cover .tag-intercambio{
+  background: rgba(244,232,210,.9); color: var(--ub-gold-deep);
+}
+html[data-theme="dark"] body.ub-glass.ub-accion-catalogo .book-card .tag-venta,
+html[data-theme="dark"] body.ub-glass.ub-accion-detalle_libro .book-detail__cover .tag-venta{
+  background: rgba(30,90,70,.8); border-color: rgba(111,208,166,.3);
+}
+html[data-theme="dark"] body.ub-glass.ub-accion-catalogo .book-card .tag-intercambio,
+html[data-theme="dark"] body.ub-glass.ub-accion-detalle_libro .book-detail__cover .tag-intercambio{
+  background: rgba(70,56,34,.85); border-color: rgba(211,173,115,.3);
+}
+
+/* Libros reservados */
+body.ub-glass.ub-accion-catalogo .cover--unavailable .cover__bg,
+body.ub-glass.ub-accion-catalogo .cover--unavailable .cover__img,
+body.ub-glass.ub-accion-catalogo .cover--unavailable .no-image{ opacity:.45; filter:grayscale(.35); }
+body.ub-glass.ub-accion-catalogo .cover--unavailable .cover__bg{ filter: blur(22px) grayscale(.35); }
+body.ub-glass.ub-accion-catalogo .cover__overlay{
+  z-index:2;
+  background: rgba(255,255,255,.28);
+}
+
+
+/* ==========================================================================
+   4. DETALLE — BOTÓN «VOLVER AL CATÁLOGO»
+   ========================================================================== */
+
+body.ub-glass.ub-accion-detalle_libro .book-detail__back{
+  display:inline-flex; align-items:center; gap:10px;
+  min-height:46px;
+  margin:0 0 22px;
+  padding:6px 22px 6px 7px;
+  background: linear-gradient(180deg, rgba(255,255,255,.92), rgba(240,246,255,.72));
+  border:1px solid var(--bk-line);
+  border-radius:999px;
+  box-shadow: var(--ub-inset), 0 8px 22px rgba(46,84,140,.14);
+  -webkit-backdrop-filter: blur(18px) saturate(170%);
+  backdrop-filter: blur(18px) saturate(170%);
+  font:700 13.5px/1 var(--ub-font);
+  letter-spacing:-.005em;
+  color: var(--ub-navy);
+  cursor:pointer;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  transition: transform .22s var(--bk-ease), box-shadow .22s var(--bk-ease), background .22s ease, border-color .22s ease, color .2s ease;
+}
+html[data-theme="dark"] body.ub-glass.ub-accion-detalle_libro .book-detail__back{
+  background: linear-gradient(180deg, rgba(58,98,168,.55), rgba(30,54,98,.7));
+  box-shadow: var(--ub-inset), 0 8px 22px rgba(0,0,0,.35);
+}
+
+body.ub-glass.ub-accion-detalle_libro .book-detail__back-icon{
+  display:grid; place-items:center;
+  flex:none;
+  width:32px; height:32px;
+  background: linear-gradient(180deg, #2f74d6, #1a4a8c);
+  border-radius:50%;
+  box-shadow: 0 4px 10px rgba(26,74,140,.35), inset 0 1px 0 rgba(255,255,255,.35);
+  color:#fff;
+  font-size:15px; line-height:1;
+  transition: transform .22s var(--bk-ease);
+}
+body.ub-glass.ub-accion-detalle_libro .book-detail__back-icon i{ display:block; line-height:1; }
+
+body.ub-glass.ub-accion-detalle_libro .book-detail__back:hover{
+  transform: translateY(-2px);
+  background: linear-gradient(180deg, #fff, rgba(232,242,255,.9));
+  border-color: rgba(44,111,209,.5);
+  box-shadow: var(--ub-inset), 0 14px 30px rgba(46,84,140,.22);
+  color: var(--ub-navy);
+}
+html[data-theme="dark"] body.ub-glass.ub-accion-detalle_libro .book-detail__back:hover{
+  background: linear-gradient(180deg, rgba(74,120,196,.65), rgba(40,70,124,.75));
+}
+body.ub-glass.ub-accion-detalle_libro .book-detail__back:hover .book-detail__back-icon{ transform: translateX(-3px); }
+
+body.ub-glass.ub-accion-detalle_libro .book-detail__back:focus-visible{
+  outline:3px solid var(--bk-ring);
+  outline-offset:3px;
+  border-radius:999px;
+}
+body.ub-glass.ub-accion-detalle_libro .book-detail__back:active{
+  transform: translateY(0) scale(.97);
+  box-shadow: var(--ub-inset), 0 4px 12px rgba(46,84,140,.16);
+}
+body.ub-glass.ub-accion-detalle_libro .book-detail__back:active .book-detail__back-icon{ transform: translateX(-4px) scale(.94); }
+
+
+/* ==========================================================================
+   5. DETALLE — COMPOSICIÓN, PORTADA, ENCABEZADO Y ACCIONES
+   ========================================================================== */
+
+body.ub-glass.ub-accion-detalle_libro .book-detail{
+  grid-template-columns: minmax(280px, 380px) minmax(0, 1fr);
+  gap:30px;
+  align-items:start;
+}
+
+/* Portada: marco de vidrio con proporción estable */
+body.ub-glass.ub-accion-detalle_libro .book-detail__cover{
+  position:sticky; top:18px;
+  aspect-ratio: 4 / 5;
+  max-height:560px;
+  width:100%;
+  padding:0;
+  border:1px solid var(--bk-tile-edge);
+  border-radius:30px;
+  box-shadow: 0 26px 60px rgba(46,84,140,.22), 0 4px 12px rgba(46,84,140,.08), var(--ub-inset);
+}
+body.ub-glass.ub-accion-detalle_libro .book-detail__cover::after{
+  content:""; position:absolute; inset:0; z-index:2; pointer-events:none;
+  border-radius:inherit;
+  background: linear-gradient(160deg, rgba(255,255,255,.32), rgba(255,255,255,0) 38%);
+}
+body.ub-glass.ub-accion-detalle_libro .book-detail__cover .cover__img{ padding:14px; }
+body.ub-glass.ub-accion-detalle_libro .book-detail__cover .cover__img{
+  filter: drop-shadow(0 12px 22px rgba(14,40,80,.28));
+}
+body.ub-glass.ub-accion-detalle_libro .book-detail__tag{ top:16px; left:16px; padding:7px 15px; font-size:11.5px; }
+
+/* Panel de información */
+body.ub-glass.ub-accion-detalle_libro .book-detail__info{
+  padding:34px 36px 32px;
+  background:
+    var(--ub-sheen),
+    var(--ub-glass-2);
+  border-radius:30px;
+  box-shadow: var(--ub-shadow), var(--ub-inset);
+}
+
+/* Encabezado */
+body.ub-glass.ub-accion-detalle_libro .book-detail__header{
+  margin-bottom:26px;
+  padding-bottom:26px;
+  border-bottom:1px solid var(--bk-tile-edge);
+}
+html[data-theme="dark"] body.ub-glass.ub-accion-detalle_libro .book-detail__header{ border-bottom-color: var(--bk-card-edge); }
+
+body.ub-glass.ub-accion-detalle_libro .book-detail__header .stamp-own{ margin-bottom:12px !important; }
+
+body.ub-glass.ub-accion-detalle_libro .book-detail__title{
+  margin:0 0 10px;
+  font:800 clamp(26px, 3.1vw, 36px)/1.12 var(--ub-font);
+  letter-spacing:-.025em;
+  overflow-wrap:anywhere;
+}
+body.ub-glass.ub-accion-detalle_libro .book-detail__author{
+  display:block;
+  margin:0 0 22px;
+  font-size:14.5px; font-weight:500; line-height:1.5;
+  color: var(--ub-slate);
+  overflow-wrap:anywhere;
+}
+body.ub-glass.ub-accion-detalle_libro .book-detail__author .ub-icon{ color: var(--ub-blue); }
+
+body.ub-glass.ub-accion-detalle_libro .book-detail__price-row{
+  display:flex; align-items:center; flex-wrap:wrap; gap:10px 12px;
+}
+body.ub-glass.ub-accion-detalle_libro .book-detail__price.price{
+  margin-right:6px;
+  font:800 clamp(32px, 4vw, 42px)/1 var(--ub-font);
+  letter-spacing:-.03em;
+  color: var(--ub-navy);
+  white-space:nowrap;
+}
+body.ub-glass.ub-accion-detalle_libro .book-detail__price-row .stamp{
+  padding:7px 14px;
+  font-size:11.5px;
+  border:1px solid rgba(255,255,255,.6);
+}
+html[data-theme="dark"] body.ub-glass.ub-accion-detalle_libro .book-detail__price-row .stamp{ border-color: var(--bk-card-edge); }
+
+/* Acciones */
+body.ub-glass.ub-accion-detalle_libro .book-detail__actions{
+  gap:12px;
+  margin-top:24px;
+}
+body.ub-glass.ub-accion-detalle_libro .book-detail__actions .btn-ub{
+  min-height:54px;
+  font-size:14.5px;
+  letter-spacing:-.005em;
+  transition: transform .2s var(--bk-ease), box-shadow .2s ease, filter .2s ease, background .2s ease;
+}
+/* «Solicitar intercambio» / «Inicia sesión para solicitar intercambio»: acción principal */
+body.ub-glass.ub-accion-detalle_libro .book-detail__actions .btn-ub-outline{
+  background: linear-gradient(180deg, #2f74d6, #1a4a8c);
+  border-color: rgba(255,255,255,.28);
+  color:#fff;
+  box-shadow: 0 12px 26px rgba(26,74,140,.32), inset 0 1px 0 rgba(255,255,255,.32);
+}
+body.ub-glass.ub-accion-detalle_libro .book-detail__actions .btn-ub-outline:hover{
+  background: linear-gradient(180deg, #3a80e4, #1d539c);
+  color:#fff;
+  transform: translateY(-2px);
+  box-shadow: 0 18px 34px rgba(26,74,140,.38), inset 0 1px 0 rgba(255,255,255,.36);
+}
+body.ub-glass.ub-accion-detalle_libro .book-detail__actions .btn-ub-gold:hover,
+body.ub-glass.ub-accion-detalle_libro .book-detail__actions .btn-ub-dark:hover{ transform: translateY(-2px); }
+body.ub-glass.ub-accion-detalle_libro .book-detail__actions .btn-ub:active{ transform: translateY(0) scale(.985); filter:brightness(.97); }
+body.ub-glass.ub-accion-detalle_libro .book-detail__actions .btn-ub:focus-visible{
+  outline:3px solid var(--bk-ring); outline-offset:3px; border-radius:999px;
+}
+body.ub-glass.ub-accion-detalle_libro .book-detail__actions p{
+  margin:0;
+  padding:12px 16px;
+  background: var(--bk-tile);
+  border:1px solid var(--bk-tile-edge);
+  border-radius:16px;
+  font-size:13.5px !important; line-height:1.5;
+  color: var(--ub-slate) !important;
+}
+/* La nota bajo «Solicitar intercambio» es una ayuda, no un aviso */
+body.ub-glass.ub-accion-detalle_libro .book-detail__actions .btn-ub + p{
+  padding:0 6px; background:none; border:0; border-radius:0;
+  font-size:12.5px !important;
+  color: var(--ub-muted) !important;
+  text-align:center;
+}
+
+
+/* ==========================================================================
+   6. DETALLE — DATOS ACADÉMICOS, DESCRIPCIÓN, VENDEDOR
+   ========================================================================== */
+
+body.ub-glass.ub-accion-detalle_libro .book-detail__meta{
+  display:grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap:12px;
+  margin-bottom:24px;
+}
+body.ub-glass.ub-accion-detalle_libro .book-detail__meta .meta-item{
+  min-width:0;
+  padding:14px 18px 15px;
+  background: var(--bk-tile);
+  border:1px solid var(--bk-tile-edge);
+  border-radius:18px;
+  box-shadow: var(--ub-inset);
+  transition: background .2s ease, border-color .2s ease, transform .2s var(--bk-ease);
+}
+body.ub-glass.ub-accion-detalle_libro .book-detail__meta .meta-item:hover{
+  background: var(--ub-glass-3);
+  transform: translateY(-1px);
+}
+body.ub-glass.ub-accion-detalle_libro .book-detail__meta .ub-eyebrow,
+body.ub-glass.ub-accion-detalle_libro .book-detail__description .ub-eyebrow{
+  gap:7px;
+  font:700 11px/1 var(--ub-font);
+  letter-spacing:.06em;
+  text-transform:uppercase;
+  color: var(--ub-gold-deep);
+}
+body.ub-glass.ub-accion-detalle_libro .book-detail__meta .ub-eyebrow i,
+body.ub-glass.ub-accion-detalle_libro .book-detail__description .ub-eyebrow i{
+  font-size:14px; line-height:1;
+  color: var(--ub-blue);
+}
+body.ub-glass.ub-accion-detalle_libro .book-detail__meta .meta-item p{
+  margin:9px 0 0;
+  font:600 15px/1.35 var(--ub-font);
+  color: var(--ub-navy);
+  overflow-wrap:anywhere;
+}
+
+/* Descripción */
+body.ub-glass.ub-accion-detalle_libro .book-detail__description{
+  margin-bottom:26px;
+  padding:4px 4px 0;
+}
+body.ub-glass.ub-accion-detalle_libro .book-detail__description p{
+  max-width:68ch;
+  margin:12px 0 0;
+  font-size:14.5px; line-height:1.8;
+  color: var(--ub-slate);
+  overflow-wrap:anywhere; word-break:break-word;
+}
+
+/* Vendedor */
+body.ub-glass.ub-accion-detalle_libro .seller-card{
+  display:flex; align-items:center; flex-wrap:nowrap; gap:16px;
+  padding:16px 18px;
+  background: var(--bk-tile);
+  border:1px solid var(--bk-tile-edge);
+  border-radius:22px;
+  box-shadow: var(--ub-inset), var(--ub-shadow-sm);
+  transition: box-shadow .25s var(--bk-ease), transform .25s var(--bk-ease), background .2s ease;
+}
+body.ub-glass.ub-accion-detalle_libro .seller-card:hover{
+  background: var(--ub-glass-3);
+  border-color: var(--bk-tile-edge);
+  box-shadow: var(--ub-inset), var(--ub-shadow);
+}
+body.ub-glass.ub-accion-detalle_libro .seller-card__avatar{
+  display:grid; place-items:center;
+  flex:none;
+  width:54px; height:54px;
+  background: linear-gradient(145deg, #5b8fd8, #1a4a8c);
+  border:2px solid rgba(255,255,255,.95);
+  border-radius:50%;
+  box-shadow: 0 8px 18px rgba(26,74,140,.3);
+  font:700 21px/1 var(--ub-font);
+  color:#fff;
+}
+body.ub-glass.ub-accion-detalle_libro .seller-card__info{ flex:1; min-width:0; }
+body.ub-glass.ub-accion-detalle_libro .seller-card__info .ub-eyebrow{
+  font:700 10.5px/1 var(--ub-font);
+  letter-spacing:.06em; text-transform:uppercase;
+}
+body.ub-glass.ub-accion-detalle_libro .seller-card__info h5{
+  margin:6px 0 3px;
+  font:700 17px/1.25 var(--ub-font);
+  overflow-wrap:anywhere;
+}
+body.ub-glass.ub-accion-detalle_libro .seller-card__info p{ font-size:12.5px !important; }
+body.ub-glass.ub-accion-detalle_libro .seller-card__cta{
+  flex:none;
+  min-height:42px;
+  padding:0 20px;
+  font-size:12.5px;
+  transition: transform .2s var(--bk-ease), box-shadow .2s ease, background .2s ease;
+}
+body.ub-glass.ub-accion-detalle_libro .seller-card__cta:hover{ transform: translateY(-1px); box-shadow: var(--ub-inset), var(--ub-shadow); }
+body.ub-glass.ub-accion-detalle_libro .seller-card__cta:active{ transform: scale(.97); }
+body.ub-glass.ub-accion-detalle_libro .seller-card__cta:focus-visible{ outline:3px solid var(--bk-ring); outline-offset:3px; border-radius:999px; }
+
+/* Aviso de intercambio */
+body.ub-glass.ub-accion-detalle_libro .book-detail__hint{
+  align-items:flex-start; flex-direction:column; gap:2px;
+  margin:0;
+  padding:16px 20px;
+  background: rgba(244,232,210,.5);
+  border:1px solid rgba(185,148,91,.28);
+  border-radius:20px;
+  box-shadow: var(--ub-inset);
+  font-size:13.5px; font-weight:500;
+  color: var(--ub-ink);
+}
+html[data-theme="dark"] body.ub-glass.ub-accion-detalle_libro .book-detail__hint{ background: rgba(211,173,115,.12); }
+body.ub-glass.ub-accion-detalle_libro .book-detail__hint strong{ color: var(--ub-navy); font-weight:700; }
+body.ub-glass.ub-accion-detalle_libro .book-detail__hint .ub-icon{ color: var(--ub-gold-deep); }
+body.ub-glass.ub-accion-detalle_libro .book-detail__hint p{ font-size:13px !important; color: var(--ub-slate); line-height:1.55; }
+body.ub-glass.ub-accion-detalle_libro .book-detail__info .mt-4{ margin-top:16px !important; }
+
+/* Libro no encontrado */
+body.ub-glass.ub-accion-detalle_libro .catalog-empty{ border-radius:26px; }
+
+
+/* ==========================================================================
+   7. ANIMACIONES
+   --------------------------------------------------------------------------
+   Entrada suave de portada y panel (reutiliza .reveal del proyecto).
+   ========================================================================== */
+
+body.ub-glass.ub-accion-detalle_libro .book-detail__cover.reveal{
+  transform: translateY(14px) scale(.97);
+  transition: opacity .7s var(--bk-ease), transform .7s var(--bk-ease);
+}
+body.ub-glass.ub-accion-detalle_libro .book-detail__cover.reveal.is-visible{ transform:none; }
+
+body.ub-glass.ub-accion-detalle_libro .book-detail__back.reveal{
+  transition: opacity .5s var(--bk-ease), transform .22s var(--bk-ease), box-shadow .22s var(--bk-ease), background .22s ease, border-color .22s ease, color .2s ease;
+}
+
+/* Tarjetas del catálogo: tras la entrada (.reveal), la elevación al pasar el
+   cursor debe responder al instante, sin heredar el retardo escalonado. */
+body.ub-glass.ub-accion-catalogo .libro-card.reveal.is-visible .book-card{
+  transition: transform .28s var(--bk-ease), box-shadow .28s var(--bk-ease), border-color .28s var(--bk-ease);
+}
+body.ub-glass.ub-accion-catalogo .libro-card.reveal{
+  transition: opacity .6s var(--bk-ease), transform .6s var(--bk-ease);
+}
+
+
+/* ==========================================================================
+   8. RESPONSIVE
+   ========================================================================== */
+
+@media (max-width: 1100px){
+  body.ub-glass.ub-accion-detalle_libro .book-detail{ grid-template-columns: minmax(240px, 320px) minmax(0, 1fr); gap:24px; }
+  body.ub-glass.ub-accion-detalle_libro .book-detail__info{ padding:28px 26px; }
+}
+
+@media (max-width: 900px){
+  body.ub-glass.ub-accion-catalogo .catalog-hero{ min-height:0; padding:30px 26px; border-radius:28px; }
+  body.ub-glass.ub-accion-catalogo .catalog-hero::after{
+    width:100%; opacity:.28;
+    -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 90%);
+    mask-image: linear-gradient(180deg, transparent 0, #000 90%);
+  }
+
+  body.ub-glass.ub-accion-detalle_libro .book-detail{ grid-template-columns:1fr; gap:22px; }
+  body.ub-glass.ub-accion-detalle_libro .book-detail__cover{
+    position:relative; top:auto;
+    aspect-ratio: 16 / 11;
+    max-height:380px;
+    border-radius:26px;
+  }
+  body.ub-glass.ub-accion-detalle_libro .book-detail__info{ padding:26px 22px; border-radius:26px; }
+}
+
+@media (max-width: 640px){
+  body.ub-glass.ub-accion-catalogo .catalog-hero{ padding:26px 20px; border-radius:24px; }
+  body.ub-glass.ub-accion-catalogo .catalog-grid{ grid-template-columns: 1fr; gap:16px; }
+
+  body.ub-glass.ub-accion-detalle_libro .book-detail__back{ min-height:48px; margin-bottom:18px; }
+  body.ub-glass.ub-accion-detalle_libro .book-detail__cover{ aspect-ratio: 4 / 3; max-height:320px; border-radius:22px; }
+  body.ub-glass.ub-accion-detalle_libro .book-detail__info{ padding:22px 18px; border-radius:22px; }
+  body.ub-glass.ub-accion-detalle_libro .book-detail__price-row{ flex-direction:row; align-items:center; }
+  body.ub-glass.ub-accion-detalle_libro .book-detail__price.price{ flex-basis:100%; margin-bottom:2px; }
+  body.ub-glass.ub-accion-detalle_libro .book-detail__meta{ grid-template-columns:1fr; gap:10px; }
+  body.ub-glass.ub-accion-detalle_libro .seller-card{ flex-direction:row; flex-wrap:wrap; align-items:center; text-align:left; }
+  body.ub-glass.ub-accion-detalle_libro .seller-card__info{ flex:1 1 calc(100% - 80px); }
+  body.ub-glass.ub-accion-detalle_libro .seller-card__cta{ width:100%; min-height:46px; }
+}
+
+/* El detalle comparte pantalla con la barra superior; en móvil evita que la
+   portada fija se quede pegada al hacer scroll. */
+@media (hover: none){
+  body.ub-glass.ub-accion-catalogo .book-card:hover{ transform:none; }
+  body.ub-glass.ub-accion-catalogo .book-card:active{ transform: scale(.99); }
+  body.ub-glass.ub-accion-catalogo .book-card:hover .cover .cover__img{ transform:none; }
+}
+
+
+/* ==========================================================================
+   9. MOVIMIENTO REDUCIDO
+   ========================================================================== */
+
+@media (prefers-reduced-motion: reduce){
+  body.ub-glass.ub-accion-catalogo .book-card,
+  body.ub-glass.ub-accion-catalogo .book-card .cover .cover__img,
+  body.ub-glass.ub-accion-catalogo .book-card .footer a.btn-ub,
+  body.ub-glass.ub-accion-detalle_libro .book-detail__back,
+  body.ub-glass.ub-accion-detalle_libro .book-detail__back-icon,
+  body.ub-glass.ub-accion-detalle_libro .book-detail__actions .btn-ub,
+  body.ub-glass.ub-accion-detalle_libro .meta-item,
+  body.ub-glass.ub-accion-detalle_libro .seller-card,
+  body.ub-glass.ub-accion-detalle_libro .seller-card__cta{ transition:none !important; }
+
+  body.ub-glass.ub-accion-catalogo .book-card:hover,
+  body.ub-glass.ub-accion-catalogo .book-card:hover .cover .cover__img,
+  body.ub-glass.ub-accion-detalle_libro .book-detail__back:hover,
+  body.ub-glass.ub-accion-detalle_libro .book-detail__back:hover .book-detail__back-icon,
+  body.ub-glass.ub-accion-detalle_libro .book-detail__actions .btn-ub:hover,
+  body.ub-glass.ub-accion-detalle_libro .meta-item:hover,
+  body.ub-glass.ub-accion-detalle_libro .seller-card__cta:hover{ transform:none; }
+
+  body.ub-glass.ub-accion-detalle_libro .book-detail__cover.reveal{ transform:none; }
+}
